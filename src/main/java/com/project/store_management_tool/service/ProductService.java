@@ -81,18 +81,18 @@ public class ProductService {
             throw new ProductNotFoundException("Product not found", id);
         }
 
+        Optional<User> optionalUser = userRepository.getByEmail(email);
+        if (!optionalUser.isPresent()) {
+            log.error("Email not found");
+            throw new UsernameNotFoundException("Email not found");
+        }
+
         Product product = productOptional.get();
 
         List<ProductItem> productItems = product.getProductItems();
         ProductItem productItem = updateProductItem(quantity, email, product, productItems);
 
-        Order order;
-        try {
-            order = updateOrder(email, productItem);
-        } catch (UsernameNotFoundException e) {
-            log.error(e.getMessage());
-            throw new UsernameNotFoundException("Email not found");
-        }
+        Order order = updateOrder(email, productItem);
         productRepository.save(product);
 
         return order;

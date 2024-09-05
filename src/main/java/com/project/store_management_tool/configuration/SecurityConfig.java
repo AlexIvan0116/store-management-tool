@@ -27,8 +27,8 @@ public class SecurityConfig {
                         authorizationRequest
 //                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
 //                                .requestMatchers("/api/user/**").hasRole("USER")
-//                                .requestMatchers("/api/items/**").hasAnyRole("USER", "ADMIN")
-//                                .requestMatchers("/api/orders/**").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers("/api/item/**").permitAll()
+                                .requestMatchers("/api/order/**").permitAll()
                                 .requestMatchers("/api/product/**").permitAll()
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .anyRequest().authenticated()

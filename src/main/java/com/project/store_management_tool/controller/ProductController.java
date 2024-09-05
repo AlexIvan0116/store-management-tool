@@ -41,7 +41,7 @@ public class ProductController {
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable String id) {
-        if (Validator.UUIDValidator(id)) {
+        if (!Validator.UUIDValidator(id)) {
             log.error("Path variable format incorrect.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Product());
         }
