@@ -20,11 +20,11 @@ public class ProductItem {
     private UUID uuid;
 
     @ManyToOne
-    @JoinColumn(name = "product-id", nullable = false)
+    @JoinColumn(name = "product_id")
     private Product product;
 
     @ManyToOne
-    @JoinColumn(name = "order-id", nullable = false)
+    @JoinColumn(name = "order_id")
     private Order order;
 
     private Integer quantity;

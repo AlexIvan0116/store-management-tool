@@ -1,7 +1,9 @@
 package com.project.store_management_tool.controller;
 
 import com.project.store_management_tool.controller.dto.AddProductDTO;
+import com.project.store_management_tool.controller.dto.AddProductToOrderDTO;
 import com.project.store_management_tool.controller.validator.Validator;
+import com.project.store_management_tool.model.Order;
 import com.project.store_management_tool.model.Product;
 import com.project.store_management_tool.service.ProductService;
 import com.project.store_management_tool.service.exception.ProductNotFoundException;
@@ -9,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -67,5 +70,40 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Product());
         }
         return ResponseEntity.status(HttpStatus.OK).body(product);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteProductById(@PathVariable String id) {
+        if (Validator.UUIDValidator(id)) {
+            log.error("Path variable format incorrect.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Empty");
+        }
+        try {
+            productService.deleteProductById(UUID.fromString(id));
+        } catch (ProductNotFoundException e) {
+            log.error(e.getMessage() + " " + e.getId());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Empty");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(id);
+    }
+
+    @PostMapping("/addToOrder/{id}")
+    public ResponseEntity<Order> addToOrder(@PathVariable String id, @RequestBody AddProductToOrderDTO addProductToOrderDTO) {
+        if (!(Validator.UUIDValidator(id) &&
+                Validator.quantityValidator(addProductToOrderDTO.getQuantity()) &&
+                Validator.emailValidator(addProductToOrderDTO.getEmail()))) {
+            log.error("Incorrect input");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        Order order;
+        try {
+            order = productService.addToOrder(UUID.fromString(id),
+                    Integer.valueOf(addProductToOrderDTO.getQuantity()), addProductToOrderDTO.getEmail());
+        } catch (UsernameNotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(order);
     }
 }

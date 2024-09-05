@@ -1,5 +1,6 @@
 package com.project.store_management_tool.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "order")
+@Table(name = "order-table")
 public class Order {
     @NonNull
     @Id
@@ -20,10 +21,10 @@ public class Order {
 
     private double totalPrice;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "order", orphanRemoval = true)
     private List<ProductItem> productItems;
 
     @ManyToOne
-    @JoinColumn(name = "user-id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 }

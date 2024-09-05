@@ -10,4 +10,14 @@ public class Validator {
         String regex = "(-?\\d+(\\.\\d*)?)|(-?\\.\\d+)";
         return price.matches(regex);
     }
+
+    public static boolean quantityValidator(String quantity) {
+        String regex = "^\\d+$";
+        return quantity.matches(regex);
+    }
+
+    public static boolean emailValidator(String email) {
+        String regex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
+        return email.matches(regex);
+    }
 }

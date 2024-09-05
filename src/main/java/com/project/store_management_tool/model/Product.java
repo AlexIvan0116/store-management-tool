@@ -1,6 +1,6 @@
 package com.project.store_management_tool.model;
 
-import com.project.store_management_tool.repository.ProductRepository;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,6 +25,7 @@ public class Product {
 
     private String description;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @OneToMany(mappedBy = "product", orphanRemoval = true)
     private List<ProductItem> productItems;
 }
