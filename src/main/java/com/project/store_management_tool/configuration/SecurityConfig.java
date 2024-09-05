@@ -1,6 +1,5 @@
 package com.project.store_management_tool.configuration;
 
-import com.project.store_management_tool.util.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,11 +25,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizationRequest ->
                         authorizationRequest
-                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                                .requestMatchers("/api/user/**").hasRole("USER")
-                                .requestMatchers("/api/items/**").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers("/api/orders/**").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers("/api/products/**").hasAnyRole("USER", "ADMIN")
+//                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+//                                .requestMatchers("/api/user/**").hasRole("USER")
+//                                .requestMatchers("/api/items/**").hasAnyRole("USER", "ADMIN")
+//                                .requestMatchers("/api/orders/**").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers("/api/product/**").permitAll()
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .anyRequest().authenticated()
 

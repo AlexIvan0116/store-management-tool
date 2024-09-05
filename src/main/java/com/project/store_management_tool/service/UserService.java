@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,9 +24,12 @@ public class UserService {
     private final RegisterUserDtoToUser dtoConverter;
     private final JWTUtil jwtUtil;
 
-    public User registerUser(RegisterUserDTO registerUserDTO) {
-        userRepository.getByEmail(registerUserDTO.getEmail()).ifPresent(
-                (user) -> { throw new UserAlreadyRegisteredException(user.getEmail()); });
+    public User registerUser(RegisterUserDTO registerUserDTO) throws UserAlreadyRegisteredException {
+        Optional<User> user = userRepository.getByEmail(registerUserDTO.getEmail());
+
+        if (user.isPresent()) {
+            throw new UserAlreadyRegisteredException(user.get().getEmail());
+        }
 
         return userRepository.save(dtoConverter.covertDtoToModel(registerUserDTO));
     }
@@ -44,5 +48,9 @@ public class UserService {
         }
 
         throw new UsernameNotFoundException("Email not found!");
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }
