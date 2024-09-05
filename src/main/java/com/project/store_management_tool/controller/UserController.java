@@ -59,4 +59,5 @@ public class UserController {
         List<User> userList = userService.getAllUsers();
         return ResponseEntity.status(HttpStatus.OK).body(userList);
     }
+
 }

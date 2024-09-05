@@ -10,9 +10,12 @@ import com.project.store_management_tool.repository.OrderRepository;
 import com.project.store_management_tool.repository.ProductItemRepository;
 import com.project.store_management_tool.repository.ProductRepository;
 import com.project.store_management_tool.repository.UserRepository;
+import com.project.store_management_tool.service.exception.ItemNotFoundInOrderException;
+import com.project.store_management_tool.service.exception.OrderNotFoundException;
 import com.project.store_management_tool.service.exception.ProductNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -140,4 +143,38 @@ public class ProductService {
         return order;
     }
 
+    public void deleteProductFromOrder(UUID orderId, UUID productId) {
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+        if (optionalOrder.isEmpty()) {
+            log.error("Order not found");
+            throw new OrderNotFoundException("Order not found", orderId);
+        }
+
+        if (optionalProduct.isEmpty()) {
+            log.error("Product not found");
+            throw new ProductNotFoundException("Product not found", orderId);
+        }
+
+        Order order = optionalOrder.get();
+        Product product = optionalProduct.get();
+
+        Optional<ProductItem> optionalItem = order.getProductItems().stream()
+                .filter(item -> item.getProduct().getId().equals(productId)).findFirst();
+
+        if (optionalItem.isEmpty()) {
+            log.error("Item not found in order");
+            throw new ItemNotFoundInOrderException("Item not found in order", productId);
+        }
+
+        order.setTotalPrice(order.getTotalPrice() - optionalItem.get().getPrice());
+
+        order.getProductItems().remove(optionalItem.get());
+        product.getProductItems().remove(optionalItem.get());
+
+
+        productRepository.saveAndFlush(product);
+        orderRepository.saveAndFlush(order);
+        productItemRepository.delete(optionalItem.get());
+    }
 }

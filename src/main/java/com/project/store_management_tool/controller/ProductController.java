@@ -106,4 +106,16 @@ public class ProductController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(order);
     }
+
+    @DeleteMapping("/deleteFromOrder/{orderId}/{productId}")
+    public ResponseEntity<String> deleteProductFromOrder(@PathVariable String orderId, @PathVariable String productId) {
+        if (!(Validator.UUIDValidator(orderId) && Validator.UUIDValidator(productId))) {
+            log.error("Incorrect input");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        productService.deleteProductFromOrder(UUID.fromString(orderId), UUID.fromString(productId));
+
+        return ResponseEntity.status(HttpStatus.OK).body("Success");
+    }
 }
