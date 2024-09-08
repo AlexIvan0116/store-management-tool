@@ -65,14 +65,17 @@ public class ProductService {
 
         List<ProductItem> productItems = product.getProductItems();
 
-        productItems.stream().map(item -> {
+        List<ProductItem> itemsAfterChangingPrice = productItems.stream().map(item -> {
             item.setPrice(item.getQuantity() * price);
             return item;
-        }).map(item -> {
+        }).collect(Collectors.toList());
+
+        itemsAfterChangingPrice.stream().map(item -> {
             Order order = item.getOrder();
             order.setTotalPrice(order.getTotalPrice() + (price - oldPrice) * item.getQuantity());
             return order;
-        });
+        }).collect(Collectors.toList());
+
         return productRepository.findById(id).get();
     }
 

@@ -61,7 +61,7 @@ public class Util {
         return Product.builder()
                 .id(UUID.randomUUID())
                 .description("lalala")
-                .name("masina")
+                .name(name)
                 .productItems(new ArrayList<>())
                 .price(price).build();
     }
