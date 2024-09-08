@@ -2,12 +2,14 @@ package com.project.store_management_tool.controller.dto;
 
 import com.project.store_management_tool.model.Product;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
+@Builder
 public class AddProductDTO {
     private final String name;
     private final String description;

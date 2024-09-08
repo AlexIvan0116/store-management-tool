@@ -1,5 +1,7 @@
 package com.project.store_management_tool.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.store_management_tool.controller.dto.AddProductDTO;
 import com.project.store_management_tool.model.Product;
 import com.project.store_management_tool.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +19,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,6 +36,8 @@ public class ProductControllerTest {
     private ProductController productController;
 
     private MockMvc mockMvc;
+
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
@@ -64,9 +69,56 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.id").value(id.toString()));
     }
 
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void addProduct() throws Exception {
+        AddProductDTO productDTO = getAddProductDTO();
+        Product product = productDTO.convertToModel();
+        Mockito.when(productService.addProduct(Mockito.any(AddProductDTO.class))).thenReturn(product);
+        byte[] inputBody = objectMapper.writeValueAsBytes(productDTO);
+
+        mockMvc.perform(post("/api/product/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(inputBody)
+                .header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").exists());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void addMultiple() throws Exception {
+        List<AddProductDTO> productDTOList = Arrays.asList(getAddProductDTO(), getAddProductDTO());
+        List<Product> productList = Arrays.asList(productDTOList.get(0).convertToModel(), productDTOList.get(1).convertToModel());
+        Mockito.when(productService.addProducts(Mockito.anyList())).thenReturn(productList);
+        byte[] inputBody = objectMapper.writeValueAsBytes(productDTOList);
+
+        mockMvc.perform(post("/api/product/add/multiple")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(inputBody)
+                .header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").exists());
+    }
+
     private List<Product> getProducts() {
         return Arrays.asList(Product.builder().id(UUID.randomUUID()).build(),
                 Product.builder().id(UUID.randomUUID()).build(),
                 Product.builder().id(UUID.randomUUID()).build());
+    }
+
+    private AddProductDTO getAddProductDTO() {
+        return AddProductDTO.builder()
+                .description("lalala")
+                .name("masina")
+                .price(12.5).build();
+    }
+
+    private Product getProduct() {
+        return Product.builder()
+                .id(UUID.randomUUID())
+                .description("lalala")
+                .name("masina")
+                .price(12.5).build();
     }
 }
