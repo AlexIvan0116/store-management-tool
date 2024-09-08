@@ -147,6 +147,10 @@ public class ProductService {
             order = optionalOrder.get();
             order.setUser(optionalUser.get());
 
+            if (order.getProductItems().stream().noneMatch(item -> item.getUuid().equals(productItem.getUuid()))) {
+                order.getProductItems().add(productItem);
+            }
+
             orderRepository.saveAndFlush(order);
             AtomicReference<Double> totalPrice = new AtomicReference<>(0.0);
             order.getProductItems().forEach(item -> totalPrice.updateAndGet(v -> v + item.getPrice()));

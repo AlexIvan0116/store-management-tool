@@ -34,12 +34,18 @@ public class Util {
     }
 
     public static Order getOrder(String quantity) {
-        return "0".equals(quantity) ? Order.builder()
-                .id(UUID.randomUUID())
-                .productItems(new ArrayList<>()).build() :
-                Order.builder()
+        return Order.builder()
                 .id(UUID.randomUUID())
                 .productItems(Arrays.asList(getProductItem(quantity))).build();
+    }
+
+    /*
+        Returns empty order
+     */
+    public static Order getOrder() {
+        return Order.builder()
+                .id(UUID.randomUUID())
+                .productItems(new ArrayList<>()).build();
     }
 
     public static Product getProduct() {
@@ -65,6 +71,12 @@ public class Util {
                 .uuid(UUID.randomUUID())
                 .product(getProduct())
                 .quantity(Integer.valueOf(quantity)).build();
+    }
+
+    public static ProductItem getProductItem() {
+        return ProductItem.builder()
+                .uuid(UUID.randomUUID())
+                .build();
     }
 
     public static User getUser() {
