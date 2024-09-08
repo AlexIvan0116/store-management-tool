@@ -7,7 +7,7 @@ import com.project.store_management_tool.model.Order;
 import com.project.store_management_tool.model.Product;
 import com.project.store_management_tool.model.ProductItem;
 import com.project.store_management_tool.service.ProductService;
-import org.aspectj.weaver.ast.Or;
+import com.project.store_management_tool.util.Util;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,10 +18,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static com.project.store_management_tool.util.Util.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -171,44 +170,5 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$").value("Success"));
     }
 
-    private List<Product> getProducts() {
-        return Arrays.asList(Product.builder().id(UUID.randomUUID()).build(),
-                Product.builder().id(UUID.randomUUID()).build(),
-                Product.builder().id(UUID.randomUUID()).build());
-    }
 
-    private AddProductDTO getAddProductDTO() {
-        return AddProductDTO.builder()
-                .description("lalala")
-                .name("masina")
-                .price(12.5).build();
-    }
-
-    private AddProductToOrderDTO getAddProductToOrderDto(String quantity) {
-        return AddProductToOrderDTO.builder()
-                .email("ex@gmail.com")
-                .quantity(quantity)
-                .build();
-    }
-
-    private Order getOrder(String quantity) {
-        return Order.builder()
-                .id(UUID.randomUUID())
-                .productItems(Arrays.asList(getProductItem(quantity))).build();
-    }
-
-    private Product getProduct() {
-        return Product.builder()
-                .id(UUID.randomUUID())
-                .description("lalala")
-                .name("masina")
-                .price(12.5).build();
-    }
-
-    private ProductItem getProductItem(String quantity) {
-        return ProductItem.builder()
-                .uuid(UUID.randomUUID())
-                .product(getProduct())
-                .quantity(Integer.valueOf(quantity)).build();
-    }
 }

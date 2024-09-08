@@ -34,10 +34,9 @@ public class ProductService {
     private ProductItemRepository productItemRepository;
     private OrderRepository orderRepository;
     private UserRepository userRepository;
-    private AddProductDtoToProduct addProductDtoToProduct;
 
     public Product addProduct(AddProductDTO addProductDTO) {
-        return productRepository.save(addProductDtoToProduct.covertDtoToModel(addProductDTO));
+        return productRepository.save(addProductDTO.convertToModel());
     }
 
     public List<Product> addProducts(List<AddProductDTO> addProductDtoToProductList) {
