@@ -119,6 +119,20 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.price").value(newPrice.toString()));
     }
 
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void deleteProductById() throws Exception {
+        Product product = getProduct();
+        UUID id = product.getId();
+
+        Mockito.doNothing().when(productService).deleteProductById(id);
+
+        mockMvc.perform(delete("/api/product/delete/{id}", id)
+                .header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(id.toString()));
+    }
+
     private List<Product> getProducts() {
         return Arrays.asList(Product.builder().id(UUID.randomUUID()).build(),
                 Product.builder().id(UUID.randomUUID()).build(),
