@@ -18,8 +18,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -99,6 +98,25 @@ public class ProductControllerTest {
                 .header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").exists());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void changePriceOfProduct() throws Exception {
+        Product product = getProduct();
+        UUID id = product.getId();
+        Double newPrice = 15.0;
+        Product changedPriceProduct = new Product(product);
+        changedPriceProduct.setPrice(newPrice);
+        Mockito.when(productService.changePriceOfProduct(id, newPrice)).thenReturn(changedPriceProduct);
+
+        mockMvc.perform(patch("/api/product/price/{id}", id)
+                .contentType(MediaType.TEXT_PLAIN)
+                .content("15.0")
+                .header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id.toString()))
+                .andExpect(jsonPath("$.price").value(newPrice.toString()));
     }
 
     private List<Product> getProducts() {

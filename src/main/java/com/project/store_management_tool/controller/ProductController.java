@@ -48,24 +48,24 @@ public class ProductController {
     public ResponseEntity<Product> getProductById(@PathVariable String id) {
         if (!Validator.UUIDValidator(id)) {
             log.error("Path variable format incorrect.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Product());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         Product product;
         try {
             product = productService.getProductById(UUID.fromString(id));
         } catch (ProductNotFoundException e) {
             log.error(e.getMessage() + " " + e.getId());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Product());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         return ResponseEntity.status(HttpStatus.OK).body(product);
     }
 
     @PatchMapping("/price/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN)')")
     public ResponseEntity<Product> changePriceOfProduct(@PathVariable String id, @RequestBody String price) {
         if (!(Validator.UUIDValidator(id) && Validator.priceValidator(price))) {
             log.error("Path variable format incorrect.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Product());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
         Product product;
@@ -73,7 +73,7 @@ public class ProductController {
             product = productService.changePriceOfProduct(UUID.fromString(id), Double.valueOf(price));
         } catch (ProductNotFoundException e) {
             log.error(e.getMessage() + " " + e.getId());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Product());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         return ResponseEntity.status(HttpStatus.OK).body(product);
     }

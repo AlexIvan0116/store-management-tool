@@ -15,6 +15,13 @@ import java.util.UUID;
 @Builder
 @Table(name = "product")
 public class Product {
+    public Product(Product product) {
+        id = product.getId();
+        name = product.getName();
+        price = product.getPrice();
+        description = product.getDescription();
+    }
+
     @Id
     @NonNull
     private UUID id;
