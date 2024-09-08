@@ -1,7 +1,6 @@
 package com.project.store_management_tool.service;
 
 import com.project.store_management_tool.controller.dto.AddProductDTO;
-import com.project.store_management_tool.controller.dto.converter.AddProductDtoToProduct;
 import com.project.store_management_tool.model.Order;
 import com.project.store_management_tool.model.Product;
 import com.project.store_management_tool.model.ProductItem;
@@ -15,7 +14,6 @@ import com.project.store_management_tool.service.exception.OrderNotFoundExceptio
 import com.project.store_management_tool.service.exception.ProductNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -61,8 +59,20 @@ public class ProductService {
         }
 
         Product product = productOptional.get();
+        Double oldPrice = product.getPrice();
         product.setPrice(price);
         productRepository.save(product);
+
+        List<ProductItem> productItems = product.getProductItems();
+
+        productItems.stream().map(item -> {
+            item.setPrice(item.getQuantity() * price);
+            return item;
+        }).map(item -> {
+            Order order = item.getOrder();
+            order.setTotalPrice(order.getTotalPrice() + (price - oldPrice) * item.getQuantity());
+            return order;
+        });
         return productRepository.findById(id).get();
     }
 
@@ -89,14 +99,14 @@ public class ProductService {
         productRepository.delete(productOptional.get());
     }
 
-    public Order addToOrder(UUID id, Integer quantity, String email) {
+    public Order addToOrder(UUID id, Integer quantity, String email) throws  ProductNotFoundException, UsernameNotFoundException {
         Optional<Product> productOptional = productRepository.findById(id);
         if (productOptional.isEmpty()) {
             throw new ProductNotFoundException("Product not found", id);
         }
 
         Optional<User> optionalUser = userRepository.getByEmail(email);
-        if (!optionalUser.isPresent()) {
+        if (optionalUser.isEmpty()) {
             log.error("Email not found");
             throw new UsernameNotFoundException("Email not found");
         }
@@ -134,30 +144,27 @@ public class ProductService {
 
     private Order updateOrder(String email, ProductItem productItem) throws UsernameNotFoundException {
         Order order;
-        Optional<User> optionalUser = userRepository.getByEmail(email);
-        if (optionalUser.isPresent()) {
-            Optional<Order> optionalOrder = orderRepository.findOrderByUser(optionalUser.get());
-            if (optionalOrder.isEmpty()) {
-                optionalOrder = Optional.of(Order.builder()
-                        .productItems(new ArrayList<>(Arrays.asList(productItem))).
-                                id(UUID.randomUUID())
-                        .build());
+        User user = userRepository.getByEmail(email).get();
+        Optional<Order> optionalOrder = orderRepository.findOrderByUser(user);
+        if (optionalOrder.isEmpty()) {
+            optionalOrder = Optional.of(Order.builder()
+                    .productItems(new ArrayList<>(Arrays.asList(productItem))).
+                            id(UUID.randomUUID())
+                    .build());
 
-            }
-            order = optionalOrder.get();
-            order.setUser(optionalUser.get());
-
-            if (order.getProductItems().stream().noneMatch(item -> item.getUuid().equals(productItem.getUuid()))) {
-                order.getProductItems().add(productItem);
-            }
-
-            orderRepository.saveAndFlush(order);
-            AtomicReference<Double> totalPrice = new AtomicReference<>(0.0);
-            order.getProductItems().forEach(item -> totalPrice.updateAndGet(v -> v + item.getPrice()));
-            order.setTotalPrice(totalPrice.get());
-        } else {
-            throw new UsernameNotFoundException("Email not found.");
         }
+        order = optionalOrder.get();
+        order.setUser(user);
+
+        if (order.getProductItems().stream().noneMatch(item -> item.getUuid().equals(productItem.getUuid()))) {
+            order.getProductItems().add(productItem);
+        }
+
+        orderRepository.saveAndFlush(order);
+        AtomicReference<Double> totalPrice = new AtomicReference<>(0.0);
+        order.getProductItems().forEach(item -> totalPrice.updateAndGet(v -> v + item.getPrice()));
+        order.setTotalPrice(totalPrice.get());
+
         productItemRepository.saveAndFlush(productItem);
         orderRepository.saveAndFlush(order);
         return order;

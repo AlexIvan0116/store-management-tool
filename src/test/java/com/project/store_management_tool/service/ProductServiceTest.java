@@ -8,6 +8,7 @@ import com.project.store_management_tool.repository.OrderRepository;
 import com.project.store_management_tool.repository.ProductItemRepository;
 import com.project.store_management_tool.repository.ProductRepository;
 import com.project.store_management_tool.repository.UserRepository;
+import com.project.store_management_tool.service.exception.ProductNotFoundException;
 import com.project.store_management_tool.util.Util;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,12 +17,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceTest {
@@ -165,5 +166,22 @@ public class ProductServiceTest {
         Assertions.assertEquals(44.5, result.getTotalPrice());
         Assertions.assertEquals(2, result.getProductItems().size());
         Assertions.assertEquals(3, result.getProductItems().get(0).getQuantity());
+    }
+
+    @Test
+    public void addToOrder_AssertProductNotFoundException() {
+        Mockito.when(productRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.empty());
+
+        ProductNotFoundException thrown = Assertions.assertThrows(ProductNotFoundException.class, () -> productService.addToOrder(UUID.randomUUID(), 1, ""));
+        Assertions.assertTrue(thrown.getMessage().contains("Product not found"));
+    }
+
+    @Test
+    public void addToOrder_AssertUsernameNotFoundException() {
+        Mockito.when(productRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.of(new Product()));
+        Mockito.when(userRepository.getByEmail(Mockito.any(String.class))).thenReturn(Optional.empty());
+
+        UsernameNotFoundException thrown = Assertions.assertThrows(UsernameNotFoundException.class, () -> productService.addToOrder(UUID.randomUUID(), 1, "ex@gmail.com"));
+        Assertions.assertTrue(thrown.getMessage().contains("Email not found"));
     }
 }
