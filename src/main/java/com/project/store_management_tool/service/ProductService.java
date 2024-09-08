@@ -19,10 +19,7 @@ import org.aspectj.weaver.ast.Or;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -140,12 +137,17 @@ public class ProductService {
         Optional<User> optionalUser = userRepository.getByEmail(email);
         if (optionalUser.isPresent()) {
             Optional<Order> optionalOrder = orderRepository.findOrderByUser(optionalUser.get());
-            order = optionalOrder.orElseGet(() -> Order.builder().productItems(new ArrayList<>()).id(UUID.randomUUID())
-                    .user(optionalUser.get())
-                    .build());
+            if (optionalOrder.isEmpty()) {
+                optionalOrder = Optional.of(Order.builder()
+                        .productItems(new ArrayList<>(Arrays.asList(productItem))).
+                                id(UUID.randomUUID())
+                        .build());
+
+            }
+            order = optionalOrder.get();
+            order.setUser(optionalUser.get());
+
             orderRepository.saveAndFlush(order);
-            order.getProductItems().add(productItem);
-            productItem.setOrder(order);
             AtomicReference<Double> totalPrice = new AtomicReference<>(0.0);
             order.getProductItems().forEach(item -> totalPrice.updateAndGet(v -> v + item.getPrice()));
             order.setTotalPrice(totalPrice.get());

@@ -34,7 +34,10 @@ public class Util {
     }
 
     public static Order getOrder(String quantity) {
-        return Order.builder()
+        return "0".equals(quantity) ? Order.builder()
+                .id(UUID.randomUUID())
+                .productItems(new ArrayList<>()).build() :
+                Order.builder()
                 .id(UUID.randomUUID())
                 .productItems(Arrays.asList(getProductItem(quantity))).build();
     }
@@ -46,6 +49,15 @@ public class Util {
                 .name("masina")
                 .productItems(new ArrayList<>())
                 .price(12.5).build();
+    }
+
+    public static Product getProduct(String name, Double price) {
+        return Product.builder()
+                .id(UUID.randomUUID())
+                .description("lalala")
+                .name("masina")
+                .productItems(new ArrayList<>())
+                .price(price).build();
     }
 
     public static ProductItem getProductItem(String quantity) {
