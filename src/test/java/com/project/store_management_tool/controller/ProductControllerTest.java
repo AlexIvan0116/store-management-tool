@@ -2,8 +2,12 @@ package com.project.store_management_tool.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.store_management_tool.controller.dto.AddProductDTO;
+import com.project.store_management_tool.controller.dto.AddProductToOrderDTO;
+import com.project.store_management_tool.model.Order;
 import com.project.store_management_tool.model.Product;
+import com.project.store_management_tool.model.ProductItem;
 import com.project.store_management_tool.service.ProductService;
+import org.aspectj.weaver.ast.Or;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -133,6 +137,40 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$").value(id.toString()));
     }
 
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void addToOrder() throws Exception {
+        String quantity = "2";
+        AddProductToOrderDTO addProductToOrderDTO = getAddProductToOrderDto(quantity);
+        Order order = getOrder(quantity);
+        UUID id = order.getProductItems().get(0).getProduct().getId();
+
+        Mockito.when(productService.addToOrder(id, Integer.valueOf(quantity), addProductToOrderDTO.getEmail())).thenReturn(order);
+
+        mockMvc.perform(post("/api/product/addToOrder/{id}", id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsBytes(addProductToOrderDTO))
+                .header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(order.getId().toString()));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    public void deleteProductFromOrder() throws Exception {
+        Order order = getOrder("3");
+        UUID id = order.getId();
+        Product product = order.getProductItems().get(0).getProduct();
+        UUID productId = product.getId();
+
+        Mockito.doNothing().when(productService).deleteProductFromOrder(id, productId);
+
+        mockMvc.perform(delete("/api/product/deleteFromOrder/{orderId}/{productId}", id, productId)
+                .header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value("Success"));
+    }
+
     private List<Product> getProducts() {
         return Arrays.asList(Product.builder().id(UUID.randomUUID()).build(),
                 Product.builder().id(UUID.randomUUID()).build(),
@@ -146,11 +184,31 @@ public class ProductControllerTest {
                 .price(12.5).build();
     }
 
+    private AddProductToOrderDTO getAddProductToOrderDto(String quantity) {
+        return AddProductToOrderDTO.builder()
+                .email("ex@gmail.com")
+                .quantity(quantity)
+                .build();
+    }
+
+    private Order getOrder(String quantity) {
+        return Order.builder()
+                .id(UUID.randomUUID())
+                .productItems(Arrays.asList(getProductItem(quantity))).build();
+    }
+
     private Product getProduct() {
         return Product.builder()
                 .id(UUID.randomUUID())
                 .description("lalala")
                 .name("masina")
                 .price(12.5).build();
+    }
+
+    private ProductItem getProductItem(String quantity) {
+        return ProductItem.builder()
+                .uuid(UUID.randomUUID())
+                .product(getProduct())
+                .quantity(Integer.valueOf(quantity)).build();
     }
 }
