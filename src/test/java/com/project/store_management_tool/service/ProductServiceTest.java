@@ -252,7 +252,7 @@ public class ProductServiceTest {
         Assertions.assertTrue(order2.getTotalPrice() == 4.5);
         Assertions.assertTrue(order3.getTotalPrice() == 71);
 
-        Product result = productService.changePriceOfProduct(product1.getId(), newPrice);
+        productService.changePriceOfProduct(product1.getId(), newPrice);
 
         Assertions.assertTrue(order1.getTotalPrice() == 46.5);
         Assertions.assertTrue(order2.getTotalPrice() == 4.5);
