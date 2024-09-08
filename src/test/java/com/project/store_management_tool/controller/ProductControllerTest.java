@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductControllerTest {
@@ -50,7 +51,22 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$[2]").exists());
     }
 
+    @Test
+    @WithMockUser(roles = "USER")
+    public void getProductById() throws Exception {
+        List<Product> productList = getProducts();
+        UUID id = productList.get(2).getId();
+        Mockito.when(productService.getProductById(id)).thenReturn(productList.get(2));
+
+        mockMvc.perform(get("/api/product/get/{id}", id)
+                .header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id.toString()));
+    }
+
     private List<Product> getProducts() {
-        return Arrays.asList(new Product(), new Product(), new Product());
+        return Arrays.asList(Product.builder().id(UUID.randomUUID()).build(),
+                Product.builder().id(UUID.randomUUID()).build(),
+                Product.builder().id(UUID.randomUUID()).build());
     }
 }
