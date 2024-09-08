@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -15,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final UserDetailsService userDetailsService;
@@ -26,11 +28,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizationRequest ->
                         authorizationRequest
-//                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-//                                .requestMatchers("/api/user/**").hasRole("USER")
                                 .requestMatchers("/api/item/**").permitAll()
                                 .requestMatchers("/api/order/**").permitAll()
-                                .requestMatchers("/api/product/**").permitAll()
+                                .requestMatchers("/api/product/**").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .anyRequest().authenticated()
 

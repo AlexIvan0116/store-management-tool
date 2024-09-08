@@ -60,4 +60,9 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userList);
     }
 
+    @DeleteMapping("/delete/users")
+    public ResponseEntity<String> deleteAll() {
+        userService.deleteAll();
+        return ResponseEntity.status(HttpStatus.OK).body("Success");
+    }
 }

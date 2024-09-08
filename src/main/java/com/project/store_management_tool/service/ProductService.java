@@ -75,6 +75,21 @@ public class ProductService {
         if (productOptional.isEmpty()) {
             throw new ProductNotFoundException("Product not found", id);
         }
+        Product product = productOptional.get();
+        Optional<List<ProductItem>> productItemOptional = productItemRepository.findByProduct(product);
+        if (productItemOptional.isPresent()) {
+            for (ProductItem productItem : productItemOptional.get()) {
+                Optional<Order> optionalOrder = orderRepository.findById(productItem.getOrder().getId());
+                if (optionalOrder.isPresent()) {
+                    Order order = optionalOrder.get();
+                    optionalOrder.get().getProductItems().remove(productItem);
+                    orderRepository.saveAndFlush(optionalOrder.get());
+                    order.setTotalPrice(order.getTotalPrice() - productItem.getPrice());
+                }
+                productItem.setProduct(new Product());
+                productItemRepository.deleteById(productItem.getUuid());
+            }
+        }
         productRepository.delete(productOptional.get());
     }
 
