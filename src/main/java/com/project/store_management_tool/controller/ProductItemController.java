@@ -26,9 +26,9 @@ public class ProductItemController {
         return ResponseEntity.status(HttpStatus.OK).body(productItemService.getAllItems());
     }
 
-    @GetMapping("/by/order/{email}")
+    @GetMapping("/by/user/{email}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<ProductItem>> getByUser(@PathVariable String email) {
+    public ResponseEntity<List<ProductItem>> getByUserEmail(@PathVariable String email) {
         if (!Validator.emailValidator(email)) {
             log.error("Input error.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

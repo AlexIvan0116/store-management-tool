@@ -54,6 +54,10 @@
 - **Endpoint:** `GET /api/item/all`
 - **Roles:** Restricted access
 
+### Group items by user email - getByUserEmail(@PathVariable String email)
+- **Endpoint:** `GET /api/item/by/user/{email}`
+- **Roles:** Public access
+
 ## User Controller
 ### Register user based on email and password - register(@RequestBody RegisterUserDTO registerUserDTO)
 - **Endpoint:** `POST /api/auth/register`
