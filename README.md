@@ -1,7 +1,7 @@
 # store-management-tool
 
 ## Table dependencies
-![SQL](table dependecies.png)
+![SQL](table-dependecies.png)
 
 ## Order controller endpoints
 ### Get all orders present in the database - getAllOrders()
