@@ -53,8 +53,4 @@ public class UserService {
     public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream().map(User::convertToDto).collect(Collectors.toList());
     }
-
-    public void deleteAll() {
-        userRepository.deleteAll();
-    }
 }
