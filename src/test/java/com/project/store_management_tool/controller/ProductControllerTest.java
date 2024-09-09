@@ -37,7 +37,7 @@ public class ProductControllerTest {
 
     private MockMvc mockMvc;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {

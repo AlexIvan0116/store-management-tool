@@ -13,6 +13,12 @@ import java.util.List;
 import java.util.UUID;
 
 public class Util {
+    public static List<Order> getOrders() {
+        return Arrays.asList(Order.builder().id(UUID.randomUUID()).build(),
+                Order.builder().id(UUID.randomUUID()).build(),
+                Order.builder().id(UUID.randomUUID()).build());
+    }
+
     public static List<Product> getProducts() {
         return Arrays.asList(Product.builder().id(UUID.randomUUID()).build(),
                 Product.builder().id(UUID.randomUUID()).build(),

@@ -28,7 +28,7 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).body(orderService.getAllOrders());
     }
 
-    @GetMapping("/get/{id}")
+    @GetMapping("/get/{email}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<Order>> getOrderByEmail(@PathVariable String email) {
         if (!Validator.emailValidator(email)) {
