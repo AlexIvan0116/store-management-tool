@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,11 +22,13 @@ public class ProductItemController {
     private ProductItemService productItemService;
 
     @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ProductItem>> getItems() {
         return ResponseEntity.status(HttpStatus.OK).body(productItemService.getAllItems());
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteItemById(@PathVariable String id) {
         if (!Validator.UUIDValidator(id)) {
             log.error("Path variable format incorrect.");
