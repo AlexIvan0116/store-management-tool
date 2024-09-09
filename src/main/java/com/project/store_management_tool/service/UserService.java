@@ -8,6 +8,7 @@ import com.project.store_management_tool.repository.UserRepository;
 import com.project.store_management_tool.service.exception.UserAlreadyRegisteredException;
 import com.project.store_management_tool.util.JWTUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -52,5 +53,13 @@ public class UserService {
 
     public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream().map(User::convertToDto).collect(Collectors.toList());
+    }
+
+    public boolean isTokenValid(String token, LoginUserDTO loginUserDTO) throws UsernameNotFoundException {
+        Optional<User> optionalUser = userRepository.getByEmail(loginUserDTO.getEmail());
+        if (optionalUser.isEmpty()) {
+            throw new UsernameNotFoundException("User email not registered.");
+        }
+        return jwtUtil.isTokenValid(token, optionalUser.get().getEmail(), optionalUser.get().getRole().toString());
     }
 }

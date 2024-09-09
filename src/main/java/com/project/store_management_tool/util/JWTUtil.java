@@ -25,11 +25,11 @@ public class JWTUtil {
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
-        final Claims claims = extractallClaims(token);
+        final Claims claims = extractAllClaims(token);
         return claimsResolvers.apply(claims);
     }
 
-    private Claims extractallClaims(String token) {
+    private Claims extractAllClaims(String token) {
         return Jwts.parser().setSigningKey(getSignKey())
                 .build().parseClaimsJws(token).getBody();
     }

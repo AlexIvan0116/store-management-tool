@@ -65,4 +65,15 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userList);
     }
 
+    @GetMapping("/token/valid/{token}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<Boolean> getIsTokenValid(@PathVariable String token, @RequestBody LoginUserDTO loginUserDTO) {
+        try {
+            userService.isTokenValid(token, loginUserDTO);
+        } catch (UsernameNotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(userService.isTokenValid(token, loginUserDTO));
+    }
 }
