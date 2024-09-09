@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<String> register(@RequestBody RegisterUserDTO registerUserDTO)  {
         log.info(registerUserDTO.getEmail() + " is in process of registering...");
 
@@ -39,6 +41,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<String> login(@RequestBody LoginUserDTO loginUserDTO)  {
         log.info(loginUserDTO.getEmail() + " is in process of logging in...");
 
@@ -55,14 +58,10 @@ public class UserController {
     }
 
     @GetMapping("/users")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<User>> getUsers() {
         List<User> userList = userService.getAllUsers();
         return ResponseEntity.status(HttpStatus.OK).body(userList);
     }
 
-    @DeleteMapping("/delete/users")
-    public ResponseEntity<String> deleteAll() {
-        userService.deleteAll();
-        return ResponseEntity.status(HttpStatus.OK).body("Success");
-    }
 }
