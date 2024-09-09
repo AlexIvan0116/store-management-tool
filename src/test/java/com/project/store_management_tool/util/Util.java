@@ -1,9 +1,6 @@
 package com.project.store_management_tool.util;
 
-import com.project.store_management_tool.controller.dto.AddProductDTO;
-import com.project.store_management_tool.controller.dto.AddProductToOrderDTO;
-import com.project.store_management_tool.controller.dto.LoginUserDTO;
-import com.project.store_management_tool.controller.dto.RegisterUserDTO;
+import com.project.store_management_tool.controller.dto.*;
 import com.project.store_management_tool.model.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -95,6 +92,13 @@ public class Util {
 
     public static User getUser() {
         return User.builder()
+                .id(UUID.randomUUID())
+                .email("ex@gmail.com")
+                .build();
+    }
+
+    public static UserDto getUserDto() {
+        return UserDto.builder()
                 .id(UUID.randomUUID())
                 .email("ex@gmail.com")
                 .build();

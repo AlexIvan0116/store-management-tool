@@ -3,6 +3,7 @@ package com.project.store_management_tool.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.store_management_tool.controller.dto.LoginUserDTO;
 import com.project.store_management_tool.controller.dto.RegisterUserDTO;
+import com.project.store_management_tool.controller.dto.UserDto;
 import com.project.store_management_tool.model.Product;
 import com.project.store_management_tool.model.User;
 import com.project.store_management_tool.model.UserRoles;
@@ -25,7 +26,12 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static com.project.store_management_tool.util.Util.getRegisterUserDto;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static com.project.store_management_tool.util.Util.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -125,5 +131,18 @@ public class UserControllerTest {
                 .content(inputBody)
                 .header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void getUsers() throws Exception {
+        List<UserDto> users = new ArrayList<>(Arrays.asList(getUserDto(), getUserDto(), getUserDto()));
+        Mockito.when(userService.getAllUsers()).thenReturn(users);
+
+        mockMvc.perform(get("/api/auth/users")
+                .header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(users.get(0).getId().toString()))
+                .andExpect(jsonPath("$[2].id").value(users.get(2).getId().toString()));
     }
 }
