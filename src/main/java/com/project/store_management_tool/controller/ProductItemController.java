@@ -26,15 +26,4 @@ public class ProductItemController {
     public ResponseEntity<List<ProductItem>> getItems() {
         return ResponseEntity.status(HttpStatus.OK).body(productItemService.getAllItems());
     }
-
-    @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> deleteItemById(@PathVariable String id) {
-        if (!Validator.UUIDValidator(id)) {
-            log.error("Path variable format incorrect.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad id format");
-        }
-        productItemService.deleteItemById(UUID.fromString(id));
-        return ResponseEntity.status(HttpStatus.OK).body("Success");
-    }
 }
