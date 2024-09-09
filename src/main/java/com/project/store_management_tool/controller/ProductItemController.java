@@ -12,7 +12,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/item")
@@ -25,5 +24,15 @@ public class ProductItemController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ProductItem>> getItems() {
         return ResponseEntity.status(HttpStatus.OK).body(productItemService.getAllItems());
+    }
+
+    @GetMapping("/by/order/{email}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<List<ProductItem>> getByUser(@PathVariable String email) {
+        if (!Validator.emailValidator(email)) {
+            log.error("Input error.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(productItemService.getItemsByUser(email));
     }
 }
