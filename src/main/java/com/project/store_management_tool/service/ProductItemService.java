@@ -24,7 +24,7 @@ public class ProductItemService {
         return productItemRepository.findAll();
     }
 
-    public List<ProductItem> getItemsByUser(String email) {
+    public List<ProductItem> getItemsByUser(String email) throws UsernameNotFoundException {
         Optional<User> optionalUser = userRepository.getByEmail(email);
 
         if (optionalUser.isEmpty()) {

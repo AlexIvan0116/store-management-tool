@@ -10,10 +10,17 @@ import java.util.UUID;
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
 @Getter
 public class ItemNotFoundInOrderException extends RuntimeException {
-    private UUID id;
+    private UUID productId;
+    private UUID orderId;
 
-    public ItemNotFoundInOrderException(String message, UUID id) {
+    public ItemNotFoundInOrderException(String message, UUID productId, UUID orderId) {
         super(message);
-        this.id = id;
+        this.productId = productId;
+        this.orderId = orderId;
+    }
+
+    @Override
+    public String getMessage() {
+        return "Product with id " + productId.toString() + " could not be found in order " + orderId.toString();
     }
 }

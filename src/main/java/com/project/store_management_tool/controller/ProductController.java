@@ -6,6 +6,8 @@ import com.project.store_management_tool.controller.validator.Validator;
 import com.project.store_management_tool.model.Order;
 import com.project.store_management_tool.model.Product;
 import com.project.store_management_tool.service.ProductService;
+import com.project.store_management_tool.service.exception.ItemNotFoundInOrderException;
+import com.project.store_management_tool.service.exception.OrderNotFoundException;
 import com.project.store_management_tool.service.exception.ProductNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,19 +47,13 @@ public class ProductController {
 
     @GetMapping("/get/{id}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<Product> getProductById(@PathVariable String id) {
+    public ResponseEntity<Product> getProductById(@PathVariable String id) throws ProductNotFoundException {
         if (!Validator.UUIDValidator(id)) {
             log.error("Path variable format incorrect.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        Product product;
-        try {
-            product = productService.getProductById(UUID.fromString(id));
-        } catch (ProductNotFoundException e) {
-            log.error(e.getMessage() + " " + e.getId());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(product);
+
+        return ResponseEntity.status(HttpStatus.OK).body(productService.getProductById(UUID.fromString(id)));
     }
 
     @PatchMapping("/price/{id}")
@@ -68,35 +64,27 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
-        Product product;
-        try {
-            product = productService.changePriceOfProduct(UUID.fromString(id), Double.valueOf(price));
-        } catch (ProductNotFoundException e) {
-            log.error(e.getMessage() + " " + e.getId());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(product);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(productService.changePriceOfProduct(UUID.fromString(id), Double.valueOf(price)));
     }
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> deleteProductById(@PathVariable String id) {
+    public ResponseEntity<String> deleteProductById(@PathVariable String id) throws ProductNotFoundException {
         if (!Validator.UUIDValidator(id)) {
             log.error("Path variable format incorrect.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Empty");
         }
-        try {
-            productService.deleteProductById(UUID.fromString(id));
-        } catch (ProductNotFoundException e) {
-            log.error(e.getMessage() + " " + e.getId());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Empty");
-        }
+
+        productService.deleteProductById(UUID.fromString(id));
+
         return ResponseEntity.status(HttpStatus.OK).body(id);
     }
 
     @PostMapping("/addToOrder/{id}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<Order> addToOrder(@PathVariable String id, @RequestBody AddProductToOrderDTO addProductToOrderDTO) {
+    public ResponseEntity<Order> addToOrder(@PathVariable String id,
+                @RequestBody AddProductToOrderDTO addProductToOrderDTO) throws ProductNotFoundException, UsernameNotFoundException {
         if (!(Validator.UUIDValidator(id) &&
                 Validator.quantityValidator(addProductToOrderDTO.getQuantity()) &&
                 Validator.emailValidator(addProductToOrderDTO.getEmail()))) {
@@ -104,20 +92,15 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
-        Order order;
-        try {
-            order = productService.addToOrder(UUID.fromString(id),
-                    Integer.valueOf(addProductToOrderDTO.getQuantity()), addProductToOrderDTO.getEmail());
-        } catch (UsernameNotFoundException e) {
-            log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(order);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(productService.addToOrder(UUID.fromString(id),
+                        Integer.valueOf(addProductToOrderDTO.getQuantity()), addProductToOrderDTO.getEmail()));
     }
 
     @DeleteMapping("/deleteFromOrder/{orderId}/{productId}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<String> deleteProductFromOrder(@PathVariable String orderId, @PathVariable String productId) {
+    public ResponseEntity<String> deleteProductFromOrder(@PathVariable String orderId, @PathVariable String productId)
+            throws OrderNotFoundException, ProductNotFoundException, ItemNotFoundInOrderException {
         if (!(Validator.UUIDValidator(orderId) && Validator.UUIDValidator(productId))) {
             log.error("Incorrect input");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

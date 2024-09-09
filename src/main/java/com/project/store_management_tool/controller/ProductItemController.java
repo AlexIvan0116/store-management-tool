@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public class ProductItemController {
 
     @GetMapping("/by/user/{email}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<ProductItem>> getByUserEmail(@PathVariable String email) {
+    public ResponseEntity<List<ProductItem>> getByUserEmail(@PathVariable String email) throws UsernameNotFoundException {
         if (!Validator.emailValidator(email)) {
             log.error("Input error.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

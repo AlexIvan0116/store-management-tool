@@ -12,6 +12,7 @@ import com.project.store_management_tool.repository.UserRepository;
 import com.project.store_management_tool.service.exception.ItemNotFoundInOrderException;
 import com.project.store_management_tool.service.exception.OrderNotFoundException;
 import com.project.store_management_tool.service.exception.ProductNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,10 +31,12 @@ public class ProductService {
     private OrderRepository orderRepository;
     private UserRepository userRepository;
 
+    @Transactional
     public Product addProduct(AddProductDTO addProductDTO) {
         return productRepository.save(addProductDTO.convertToModel());
     }
 
+    @Transactional
     public List<Product> addProducts(List<AddProductDTO> addProductDtoToProductList) {
         List<Product> products = addProductDtoToProductList.stream().map(AddProductDTO::convertToModel)
                 .collect(Collectors.toList());
@@ -44,7 +47,7 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    public Product getProductById(UUID id) {
+    public Product getProductById(UUID id) throws ProductNotFoundException {
         Optional<Product> productOptional = productRepository.findById(id);
         if (productOptional.isEmpty()) {
             throw new ProductNotFoundException("Product not found", id);
@@ -52,7 +55,8 @@ public class ProductService {
         return productOptional.get();
     }
 
-    public Product changePriceOfProduct(UUID id, Double price) {
+    @Transactional
+    public Product changePriceOfProduct(UUID id, Double price) throws ProductNotFoundException {
         Optional<Product> productOptional = productRepository.findById(id);
         if (productOptional.isEmpty()) {
             throw new ProductNotFoundException("Product not found", id);
@@ -79,7 +83,8 @@ public class ProductService {
         return productRepository.findById(id).get();
     }
 
-    public void deleteProductById(UUID id) {
+    @Transactional
+    public void deleteProductById(UUID id) throws ProductNotFoundException {
         Optional<Product> productOptional = productRepository.findById(id);
         if (productOptional.isEmpty()) {
             throw new ProductNotFoundException("Product not found", id);
@@ -102,6 +107,7 @@ public class ProductService {
         productRepository.delete(productOptional.get());
     }
 
+    @Transactional
     public Order addToOrder(UUID id, Integer quantity, String email) throws  ProductNotFoundException, UsernameNotFoundException {
         Optional<Product> productOptional = productRepository.findById(id);
         if (productOptional.isEmpty()) {
@@ -125,6 +131,7 @@ public class ProductService {
         return order;
     }
 
+    @Transactional
     private ProductItem updateProductItem(Integer quantity, String email, Product product, List<ProductItem> productItems) {
         ProductItem productItem;
         Optional<ProductItem> optionalProductItem =
@@ -145,6 +152,7 @@ public class ProductService {
         return productItem;
     }
 
+    @Transactional
     private Order updateOrder(String email, ProductItem productItem) throws UsernameNotFoundException {
         Order order;
         User user = userRepository.getByEmail(email).get();
@@ -173,16 +181,16 @@ public class ProductService {
         return order;
     }
 
-    public void deleteProductFromOrder(UUID orderId, UUID productId) {
+    @Transactional
+    public void deleteProductFromOrder(UUID orderId, UUID productId)
+            throws OrderNotFoundException, ProductNotFoundException, ItemNotFoundInOrderException {
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
         Optional<Product> optionalProduct = productRepository.findById(productId);
         if (optionalOrder.isEmpty()) {
-            log.error("Order not found");
             throw new OrderNotFoundException("Order not found", orderId);
         }
 
         if (optionalProduct.isEmpty()) {
-            log.error("Product not found");
             throw new ProductNotFoundException("Product not found", orderId);
         }
 
@@ -193,8 +201,7 @@ public class ProductService {
                 .filter(item -> item.getProduct().getId().equals(productId)).findFirst();
 
         if (optionalItem.isEmpty()) {
-            log.error("Item not found in order");
-            throw new ItemNotFoundInOrderException("Item not found in order", productId);
+            throw new ItemNotFoundInOrderException("Item not found in order", productId, orderId);
         }
 
         order.setTotalPrice(order.getTotalPrice() - optionalItem.get().getPrice());

@@ -7,6 +7,7 @@ import com.project.store_management_tool.model.User;
 import com.project.store_management_tool.repository.UserRepository;
 import com.project.store_management_tool.service.exception.UserAlreadyRegisteredException;
 import com.project.store_management_tool.util.JWTUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -25,6 +26,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JWTUtil jwtUtil;
 
+    @Transactional
     public User registerUser(RegisterUserDTO registerUserDTO) throws UserAlreadyRegisteredException {
         Optional<User> user = userRepository.getByEmail(registerUserDTO.getEmail());
 
@@ -35,7 +37,7 @@ public class UserService {
         return userRepository.save(registerUserDTO.convertToModel());
     }
 
-    public String loginUser(LoginUserDTO loginUserDTO) {
+    public String loginUser(LoginUserDTO loginUserDTO) throws BadCredentialsException {
         Optional<User> optionalUser = userRepository.getByEmail(loginUserDTO.getEmail());
 
         if (optionalUser.isPresent()) {

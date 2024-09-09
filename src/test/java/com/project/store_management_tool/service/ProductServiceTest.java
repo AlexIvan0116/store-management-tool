@@ -173,7 +173,7 @@ public class ProductServiceTest {
         Mockito.when(productRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.empty());
 
         ProductNotFoundException thrown = Assertions.assertThrows(ProductNotFoundException.class, () -> productService.addToOrder(UUID.randomUUID(), 1, ""));
-        Assertions.assertTrue(thrown.getMessage().contains("Product not found"));
+        Assertions.assertTrue(thrown.getMessage().contains("Product with id"));
     }
 
     @Test
@@ -264,6 +264,6 @@ public class ProductServiceTest {
         Mockito.when(productRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.empty());
 
         ProductNotFoundException thrown = Assertions.assertThrows(ProductNotFoundException.class, () -> productService.changePriceOfProduct(UUID.randomUUID(), 5.0));
-        Assertions.assertTrue(thrown.getMessage().contains("Product not found"));
+        Assertions.assertTrue(thrown.getMessage().contains("Product with id"));
     }
 }

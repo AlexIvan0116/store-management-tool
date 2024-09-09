@@ -26,16 +26,10 @@ public class UserController {
 
     @PostMapping("/register")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<String> register(@RequestBody RegisterUserDTO registerUserDTO)  {
+    public ResponseEntity<String> register(@RequestBody RegisterUserDTO registerUserDTO) throws UserAlreadyRegisteredException {
         log.info(registerUserDTO.getEmail() + " is in process of registering...");
 
-        User user;
-        try {
-            user = userService.registerUser(registerUserDTO);
-        } catch (UserAlreadyRegisteredException e) {
-            log.info(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        User user = userService.registerUser(registerUserDTO);
 
         log.info("User " + user.getEmail() + " created.");
         return ResponseEntity.status(HttpStatus.OK).body("User " + user.getEmail() + " created.");
@@ -50,7 +44,7 @@ public class UserController {
         try {
             token = userService.loginUser(loginUserDTO);
         } catch (BadCredentialsException | UsernameNotFoundException e) {
-            log.info(e.getMessage());
+            log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 

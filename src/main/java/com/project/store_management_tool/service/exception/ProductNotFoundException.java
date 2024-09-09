@@ -15,4 +15,9 @@ public class ProductNotFoundException extends RuntimeException {
         super(message);
         this.id = id;
     }
+
+    @Override
+    public String getMessage() {
+        return "Product with id " + id.toString() + " could not be found.";
+    }
 }

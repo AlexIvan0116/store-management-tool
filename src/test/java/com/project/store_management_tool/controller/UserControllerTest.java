@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.store_management_tool.controller.dto.LoginUserDTO;
 import com.project.store_management_tool.controller.dto.RegisterUserDTO;
 import com.project.store_management_tool.controller.dto.UserDto;
-import com.project.store_management_tool.model.Product;
 import com.project.store_management_tool.model.User;
 import com.project.store_management_tool.model.UserRoles;
 import com.project.store_management_tool.service.UserService;
