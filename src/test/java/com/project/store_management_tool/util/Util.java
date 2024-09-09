@@ -2,10 +2,9 @@ package com.project.store_management_tool.util;
 
 import com.project.store_management_tool.controller.dto.AddProductDTO;
 import com.project.store_management_tool.controller.dto.AddProductToOrderDTO;
-import com.project.store_management_tool.model.Order;
-import com.project.store_management_tool.model.Product;
-import com.project.store_management_tool.model.ProductItem;
-import com.project.store_management_tool.model.User;
+import com.project.store_management_tool.controller.dto.RegisterUserDTO;
+import com.project.store_management_tool.model.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +16,14 @@ public class Util {
         return Arrays.asList(Order.builder().id(UUID.randomUUID()).build(),
                 Order.builder().id(UUID.randomUUID()).build(),
                 Order.builder().id(UUID.randomUUID()).build());
+    }
+
+    public static RegisterUserDTO getRegisterUserDto(PasswordEncoder passwordEncoder) {
+        return RegisterUserDTO.builder()
+                .email("ex@gmail.com")
+                .passwordEncoder(passwordEncoder)
+                .password("parola")
+                .userRole(UserRoles.USER).build();
     }
 
     public static List<Product> getProducts() {
