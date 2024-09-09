@@ -2,6 +2,7 @@ package com.project.store_management_tool.controller;
 
 import com.project.store_management_tool.controller.dto.LoginUserDTO;
 import com.project.store_management_tool.controller.dto.RegisterUserDTO;
+import com.project.store_management_tool.controller.dto.UserDto;
 import com.project.store_management_tool.model.User;
 import com.project.store_management_tool.service.UserService;
 import com.project.store_management_tool.service.exception.UserAlreadyRegisteredException;
@@ -59,8 +60,8 @@ public class UserController {
 
     @GetMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<User>> getUsers() {
-        List<User> userList = userService.getAllUsers();
+    public ResponseEntity<List<UserDto>> getUsers() {
+        List<UserDto> userList = userService.getAllUsers();
         return ResponseEntity.status(HttpStatus.OK).body(userList);
     }
 

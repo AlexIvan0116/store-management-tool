@@ -2,7 +2,7 @@ package com.project.store_management_tool.service;
 
 import com.project.store_management_tool.controller.dto.LoginUserDTO;
 import com.project.store_management_tool.controller.dto.RegisterUserDTO;
-import com.project.store_management_tool.controller.dto.converter.RegisterUserDtoToUser;
+import com.project.store_management_tool.controller.dto.UserDto;
 import com.project.store_management_tool.model.User;
 import com.project.store_management_tool.repository.UserRepository;
 import com.project.store_management_tool.service.exception.UserAlreadyRegisteredException;
@@ -15,13 +15,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RegisterUserDtoToUser dtoConverter;
     private final JWTUtil jwtUtil;
 
     public User registerUser(RegisterUserDTO registerUserDTO) throws UserAlreadyRegisteredException {
@@ -31,7 +31,7 @@ public class UserService {
             throw new UserAlreadyRegisteredException(user.get().getEmail());
         }
 
-        return userRepository.save(dtoConverter.covertDtoToModel(registerUserDTO));
+        return userRepository.save(registerUserDTO.convertToModel());
     }
 
     public String loginUser(LoginUserDTO loginUserDTO) {
@@ -50,8 +50,8 @@ public class UserService {
         throw new UsernameNotFoundException("Email not found!");
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll().stream().map(User::convertToDto).collect(Collectors.toList());
     }
 
     public void deleteAll() {

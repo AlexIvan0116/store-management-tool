@@ -1,5 +1,6 @@
 package com.project.store_management_tool.model;
 
+import com.project.store_management_tool.controller.dto.UserDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -38,5 +39,12 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return email;
+    }
+
+    public UserDto convertToDto() {
+        return UserDto.builder()
+                .role(role.toString())
+                .email(email)
+                .id(id).build();
     }
 }
