@@ -1,11 +1,14 @@
 package com.project.store_management_tool.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.store_management_tool.controller.dto.LoginUserDTO;
 import com.project.store_management_tool.controller.dto.RegisterUserDTO;
 import com.project.store_management_tool.model.Product;
 import com.project.store_management_tool.model.User;
+import com.project.store_management_tool.model.UserRoles;
 import com.project.store_management_tool.service.UserService;
 import com.project.store_management_tool.service.exception.UserAlreadyRegisteredException;
+import com.project.store_management_tool.util.Util;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,18 +17,15 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.List;
-import java.util.UUID;
-
-import static com.project.store_management_tool.util.Util.getProducts;
 import static com.project.store_management_tool.util.Util.getRegisterUserDto;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -51,7 +51,7 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void getProductById() throws Exception {
+    public void register() throws Exception {
         RegisterUserDTO dto = getRegisterUserDto(passwordEncoder);
         User user = dto.convertToModel();
         Mockito.when(userService.registerUser(Mockito.any(RegisterUserDTO.class))).thenReturn(user);
@@ -67,12 +67,60 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    public void getProductById_ThrowsUserAlreadyRegisteredException() throws Exception {
+    public void register_ThrowsUserAlreadyRegisteredException() throws Exception {
         RegisterUserDTO dto = getRegisterUserDto(passwordEncoder);
         Mockito.when(userService.registerUser(Mockito.any(RegisterUserDTO.class))).thenThrow(UserAlreadyRegisteredException.class);
         byte[] inputBody = objectMapper.writeValueAsBytes(dto);
 
         mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(inputBody)
+                .header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void login() throws Exception {
+        LoginUserDTO dto = Util.getLoginUserDto();
+        String email = dto.getEmail();
+        String role = UserRoles.USER.name();
+        String jwtToken = Util.getToken(email, role);
+        Mockito.when(userService.loginUser(Mockito.any(LoginUserDTO.class))).thenReturn(jwtToken);
+        byte[] inputBody = objectMapper.writeValueAsBytes(dto);
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(inputBody)
+                .header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(jwtToken));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void login_BadCredentialsException() throws Exception {
+        LoginUserDTO dto = Util.getLoginUserDto();
+
+        Mockito.when(userService.loginUser(Mockito.any(LoginUserDTO.class))).thenThrow(BadCredentialsException.class);
+        byte[] inputBody = objectMapper.writeValueAsBytes(dto);
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(inputBody)
+                .header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void login_UsernameNotFoundException() throws Exception {
+        LoginUserDTO dto = Util.getLoginUserDto();
+
+        Mockito.when(userService.loginUser(Mockito.any(LoginUserDTO.class))).thenThrow(UsernameNotFoundException.class);
+        byte[] inputBody = objectMapper.writeValueAsBytes(dto);
+
+        mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(inputBody)
                 .header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON))

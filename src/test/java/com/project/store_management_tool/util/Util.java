@@ -2,6 +2,7 @@ package com.project.store_management_tool.util;
 
 import com.project.store_management_tool.controller.dto.AddProductDTO;
 import com.project.store_management_tool.controller.dto.AddProductToOrderDTO;
+import com.project.store_management_tool.controller.dto.LoginUserDTO;
 import com.project.store_management_tool.controller.dto.RegisterUserDTO;
 import com.project.store_management_tool.model.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -97,5 +98,16 @@ public class Util {
                 .id(UUID.randomUUID())
                 .email("ex@gmail.com")
                 .build();
+    }
+
+    public static String getToken(String email, String role) {
+        JWTUtil jwtUtil = new JWTUtil();
+        return jwtUtil.generateToken(email, role);
+    }
+
+    public static LoginUserDTO getLoginUserDto() {
+        return LoginUserDTO.builder()
+                .email("ex@gmail.com")
+                .password("parola").build();
     }
 }
