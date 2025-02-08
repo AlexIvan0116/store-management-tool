@@ -1,11 +1,12 @@
 package com.project.store_management_tool.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.project.store_management_tool.controller.dto.GetOrderByUserEmailDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -27,4 +28,17 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    public GetOrderByUserEmailDTO convertToGetOrderByUserEmailDTO() {
+        return GetOrderByUserEmailDTO.builder()
+                .orderId(id.toString())
+                .userEmail(user.getEmail())
+                .userId(user.getId().toString())
+                .productsAndQuantity(productItems.stream()
+                        .collect(Collectors.toMap(
+                                productItem -> productItem.getProduct().getId().toString(),
+                                ProductItem::getQuantity))
+                )
+                .build();
+    }
 }

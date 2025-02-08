@@ -1,5 +1,6 @@
 package com.project.store_management_tool.service;
 
+import com.project.store_management_tool.controller.dto.GetOrderByUserEmailDTO;
 import com.project.store_management_tool.model.Order;
 import com.project.store_management_tool.model.User;
 import com.project.store_management_tool.repository.OrderRepository;
@@ -9,7 +10,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -23,17 +23,16 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
-    public List<Order> getOrdersByEmailUser(String email) throws UsernameNotFoundException {
+    public List<GetOrderByUserEmailDTO> getOrdersByEmailUser(String email) throws UsernameNotFoundException {
         Optional<User> optionalUser = userRepository.getByEmail(email);
 
         if (optionalUser.isEmpty()) {
             throw new UsernameNotFoundException("Email is not associated with any account.");
         }
 
-        List<Order> orders = getAllOrders();
+        List<Order> userOrders = orderRepository.findAll().stream().filter(
+                order -> order.getUser().getEmail().equals(email)).collect(Collectors.toList());
 
-        Map<User, List<Order>> groupByUser = orders.stream().collect(Collectors.groupingBy(Order::getUser));
-
-        return groupByUser.get(optionalUser.get());
+        return userOrders.stream().map(Order::convertToGetOrderByUserEmailDTO).collect(Collectors.toList());
     }
 }

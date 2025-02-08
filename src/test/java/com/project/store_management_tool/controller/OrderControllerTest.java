@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -53,7 +54,8 @@ public class OrderControllerTest {
     public void getOrderByEmail() throws Exception {
         List<Order> orders = Util.getOrders();
         String email = "ex@gmail.com";
-        Mockito.when(orderService.getOrdersByEmailUser(Mockito.any(String.class))).thenReturn(orders);
+        Mockito.when(orderService.getOrdersByEmailUser(Mockito.any(String.class)))
+                .thenReturn(orders.stream().map(Order::convertToGetOrderByUserEmailDTO).collect(Collectors.toList()));
 
         mockMvc.perform(get("/api/order/get/{email}", email)
                 .header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON))

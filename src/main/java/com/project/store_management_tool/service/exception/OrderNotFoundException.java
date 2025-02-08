@@ -16,6 +16,11 @@ public class OrderNotFoundException extends RuntimeException {
         this.id = id;
     }
 
+    public OrderNotFoundException(String message) {
+        super(message);
+        this.id = UUID.randomUUID();
+    }
+
     @Override
     public String getMessage() {
         return "Order with id " + id.toString() + " could not be found";

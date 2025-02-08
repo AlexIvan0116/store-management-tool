@@ -1,5 +1,6 @@
 package com.project.store_management_tool.controller;
 
+import com.project.store_management_tool.controller.dto.GetOrderByUserEmailDTO;
 import com.project.store_management_tool.controller.validator.Validator;
 import com.project.store_management_tool.model.Order;
 import com.project.store_management_tool.service.OrderService;
@@ -31,7 +32,7 @@ public class OrderController {
 
     @GetMapping("/get/{email}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<Order>> getOrderByEmail(@PathVariable String email) throws UsernameNotFoundException {
+    public ResponseEntity<List<GetOrderByUserEmailDTO>> getOrdersByEmail(@PathVariable String email) throws UsernameNotFoundException {
         if (!Validator.emailValidator(email)) {
             log.error("Incorrect input");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

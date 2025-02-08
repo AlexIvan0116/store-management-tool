@@ -11,9 +11,10 @@ import java.util.UUID;
 
 public class Util {
     public static List<Order> getOrders() {
-        return Arrays.asList(Order.builder().id(UUID.randomUUID()).build(),
-                Order.builder().id(UUID.randomUUID()).build(),
-                Order.builder().id(UUID.randomUUID()).build());
+        return Arrays.asList(Order.builder().id(UUID.randomUUID())
+                        .productItems(Arrays.asList(ProductItem.builder().quantity(2).product(Product.builder().id(UUID.randomUUID()).build()).build())).build(),
+                Order.builder().id(UUID.randomUUID()).productItems(Arrays.asList(ProductItem.builder().quantity(4).product(Product.builder().id(UUID.randomUUID()).build()).build())).build(),
+                Order.builder().id(UUID.randomUUID()).productItems(Arrays.asList(ProductItem.builder().quantity(3).product(Product.builder().id(UUID.randomUUID()).build()).build())).build());
     }
 
     public static RegisterUserDTO getRegisterUserDto(PasswordEncoder passwordEncoder) {
