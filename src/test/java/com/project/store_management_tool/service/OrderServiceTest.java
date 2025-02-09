@@ -1,6 +1,6 @@
 package com.project.store_management_tool.service;
 
-import com.project.store_management_tool.controller.dto.GetOrderByUserEmailDTO;
+import com.project.store_management_tool.controller.dto.GetOrderDTO;
 import com.project.store_management_tool.model.Order;
 import com.project.store_management_tool.model.User;
 import com.project.store_management_tool.repository.OrderRepository;
@@ -62,12 +62,12 @@ public class OrderServiceTest {
         Mockito.when(userRepository.getByEmail(user2.getEmail())).thenReturn(Optional.of(user2));
         Mockito.when(orderRepository.findAll()).thenReturn(orders);
 
-        List<GetOrderByUserEmailDTO> result = orderService.getOrdersByEmailUser(user2.getEmail());
+        List<GetOrderDTO> result = orderService.getOrdersByEmailUser(user2.getEmail());
 
         Assertions.assertEquals(3, result.size());
-        Assertions.assertTrue(result.contains(order2.convertToGetOrderByUserEmailDTO()));
-        Assertions.assertTrue(result.contains(order3.convertToGetOrderByUserEmailDTO()));
-        Assertions.assertTrue(result.contains(order4.convertToGetOrderByUserEmailDTO()));
+        Assertions.assertTrue(result.contains(order2.convertToGetOrderDTO()));
+        Assertions.assertTrue(result.contains(order3.convertToGetOrderDTO()));
+        Assertions.assertTrue(result.contains(order4.convertToGetOrderDTO()));
     }
 
     @Test

@@ -1,8 +1,7 @@
 package com.project.store_management_tool.controller;
 
-import com.project.store_management_tool.controller.dto.GetOrderByUserEmailDTO;
+import com.project.store_management_tool.controller.dto.GetOrderDTO;
 import com.project.store_management_tool.controller.validator.Validator;
-import com.project.store_management_tool.model.Order;
 import com.project.store_management_tool.service.OrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,13 +25,13 @@ public class OrderController {
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Order>> getAllOrders() {
+    public ResponseEntity<List<GetOrderDTO>> getAllOrders() {
         return ResponseEntity.status(HttpStatus.OK).body(orderService.getAllOrders());
     }
 
     @GetMapping("/get/{email}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<GetOrderByUserEmailDTO>> getOrdersByEmail(@PathVariable String email) throws UsernameNotFoundException {
+    public ResponseEntity<List<GetOrderDTO>> getOrdersByEmail(@PathVariable String email) throws UsernameNotFoundException {
         if (!Validator.emailValidator(email)) {
             log.error("Incorrect input");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

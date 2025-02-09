@@ -1,6 +1,6 @@
 package com.project.store_management_tool.model;
 
-import com.project.store_management_tool.controller.dto.GetOrderByUserEmailDTO;
+import com.project.store_management_tool.controller.dto.GetOrderDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,8 +29,8 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public GetOrderByUserEmailDTO convertToGetOrderByUserEmailDTO() {
-        return GetOrderByUserEmailDTO.builder()
+    public GetOrderDTO convertToGetOrderDTO() {
+        return GetOrderDTO.builder()
                 .orderId(id.toString())
                 .userEmail(user.getEmail())
                 .userId(user.getId().toString())

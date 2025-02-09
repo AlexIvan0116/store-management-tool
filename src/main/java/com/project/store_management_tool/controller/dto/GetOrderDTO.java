@@ -11,7 +11,7 @@ import java.util.Map;
 @EqualsAndHashCode
 @Getter
 @Setter
-public class GetOrderByUserEmailDTO {
+public class GetOrderDTO {
     private String orderId;
 
     private String userId;

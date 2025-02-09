@@ -1,5 +1,6 @@
 package com.project.store_management_tool.controller;
 
+import com.project.store_management_tool.controller.dto.GetOrderDTO;
 import com.project.store_management_tool.model.Order;
 import com.project.store_management_tool.service.OrderService;
 import com.project.store_management_tool.util.Util;
@@ -40,7 +41,7 @@ public class OrderControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     public void getAllOrders() throws Exception {
-        List<Order> orders = Util.getOrders();
+        List<GetOrderDTO> orders = Util.getOrders().stream().map(Order::convertToGetOrderDTO).collect(Collectors.toList());
         Mockito.when(orderService.getAllOrders()).thenReturn(orders);
 
         mockMvc.perform(get("/api/order/all")
@@ -55,7 +56,7 @@ public class OrderControllerTest {
         List<Order> orders = Util.getOrders();
         String email = "ex@gmail.com";
         Mockito.when(orderService.getOrdersByEmailUser(Mockito.any(String.class)))
-                .thenReturn(orders.stream().map(Order::convertToGetOrderByUserEmailDTO).collect(Collectors.toList()));
+                .thenReturn(orders.stream().map(Order::convertToGetOrderDTO).collect(Collectors.toList()));
 
         mockMvc.perform(get("/api/order/get/{email}", email)
                 .header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON))

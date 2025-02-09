@@ -1,6 +1,6 @@
 package com.project.store_management_tool.service;
 
-import com.project.store_management_tool.controller.dto.GetOrderByUserEmailDTO;
+import com.project.store_management_tool.controller.dto.GetOrderDTO;
 import com.project.store_management_tool.model.Order;
 import com.project.store_management_tool.model.User;
 import com.project.store_management_tool.repository.OrderRepository;
@@ -19,11 +19,11 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
 
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+    public List<GetOrderDTO>getAllOrders() {
+        return orderRepository.findAll().stream().map(Order::convertToGetOrderDTO).collect(Collectors.toList());
     }
 
-    public List<GetOrderByUserEmailDTO> getOrdersByEmailUser(String email) throws UsernameNotFoundException {
+    public List<GetOrderDTO> getOrdersByEmailUser(String email) throws UsernameNotFoundException {
         Optional<User> optionalUser = userRepository.getByEmail(email);
 
         if (optionalUser.isEmpty()) {
@@ -33,6 +33,6 @@ public class OrderService {
         List<Order> userOrders = orderRepository.findAll().stream().filter(
                 order -> order.getUser().getEmail().equals(email)).collect(Collectors.toList());
 
-        return userOrders.stream().map(Order::convertToGetOrderByUserEmailDTO).collect(Collectors.toList());
+        return userOrders.stream().map(Order::convertToGetOrderDTO).collect(Collectors.toList());
     }
 }

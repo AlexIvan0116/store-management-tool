@@ -11,10 +11,23 @@ import java.util.UUID;
 
 public class Util {
     public static List<Order> getOrders() {
-        return Arrays.asList(Order.builder().id(UUID.randomUUID())
-                        .productItems(Arrays.asList(ProductItem.builder().quantity(2).product(Product.builder().id(UUID.randomUUID()).build()).build())).build(),
-                Order.builder().id(UUID.randomUUID()).productItems(Arrays.asList(ProductItem.builder().quantity(4).product(Product.builder().id(UUID.randomUUID()).build()).build())).build(),
-                Order.builder().id(UUID.randomUUID()).productItems(Arrays.asList(ProductItem.builder().quantity(3).product(Product.builder().id(UUID.randomUUID()).build()).build())).build());
+        return Arrays.asList(
+                Order.builder()
+                        .id(UUID.randomUUID())
+                        .user(getUser("ex@gmail.com"))
+                        .productItems(Arrays.asList(ProductItem.builder().uuid(UUID.randomUUID()).quantity(5).product(Product.builder().id(UUID.randomUUID()).build()).build())).build(),
+                Order.builder()
+                        .id(UUID.randomUUID())
+                        .user(getUser("ex1@gmail.com"))
+                        .productItems(Arrays.asList(ProductItem.builder().uuid(UUID.randomUUID()).quantity(2).product(Product.builder().id(UUID.randomUUID()).build()).build())).build(),
+                Order.builder()
+                        .id(UUID.randomUUID())
+                        .user(getUser("ex2@gmail.com"))
+                        .productItems(Arrays.asList(ProductItem.builder().uuid(UUID.randomUUID()).quantity(4).product(Product.builder().id(UUID.randomUUID()).build()).build())).build(),
+                Order.builder()
+                        .id(UUID.randomUUID())
+                        .user(getUser("ex3@gmail.com"))
+                        .productItems(Arrays.asList(ProductItem.builder().uuid(UUID.randomUUID()).quantity(3).product(Product.builder().id(UUID.randomUUID()).build()).build())).build());
     }
 
     public static RegisterUserDTO getRegisterUserDto(PasswordEncoder passwordEncoder) {
@@ -95,6 +108,13 @@ public class Util {
         return User.builder()
                 .id(UUID.randomUUID())
                 .email("ex@gmail.com")
+                .build();
+    }
+
+    public static User getUser(String email) {
+        return User.builder()
+                .id(UUID.randomUUID())
+                .email(email)
                 .build();
     }
 
