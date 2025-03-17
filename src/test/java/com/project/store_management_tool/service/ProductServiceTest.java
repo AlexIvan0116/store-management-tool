@@ -1,5 +1,6 @@
 package com.project.store_management_tool.service;
 
+import com.project.store_management_tool.controller.dto.AddToOrderDto;
 import com.project.store_management_tool.model.Order;
 import com.project.store_management_tool.model.Product;
 import com.project.store_management_tool.model.ProductItem;
@@ -65,11 +66,11 @@ public class ProductServiceTest {
         Mockito.when(orderRepository.saveAndFlush(Mockito.any(Order.class))).thenReturn(new Order());
         Mockito.when(productRepository.save(Mockito.any(Product.class))).thenReturn(new Product());
 
-        Order order = productService.addToOrder(id, quantity, email);
+        AddToOrderDto order = productService.addToOrder(id, quantity, email);
 
         Assertions.assertNotNull(order);
         Assertions.assertEquals(25.0, order.getTotalPrice());
-        Assertions.assertEquals(1, order.getProductItems().size());
+        Assertions.assertEquals(1, order.getProductItemsIds().size());
     }
 
     /*
@@ -109,11 +110,11 @@ public class ProductServiceTest {
         Mockito.when(orderRepository.saveAndFlush(Mockito.any(Order.class))).thenReturn(new Order());
         Mockito.when(productRepository.save(Mockito.any(Product.class))).thenReturn(new Product());
 
-        Order result = productService.addToOrder(id, quantity, email);
+        AddToOrderDto result = productService.addToOrder(id, quantity, email);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(51.5, result.getTotalPrice());
-        Assertions.assertEquals(3, result.getProductItems().size());
+        Assertions.assertEquals(3, result.getProductItemsIds().size());
     }
 
     /*
@@ -160,12 +161,12 @@ public class ProductServiceTest {
         Mockito.when(orderRepository.saveAndFlush(Mockito.any(Order.class))).thenReturn(new Order());
         Mockito.when(productRepository.save(Mockito.any(Product.class))).thenReturn(new Product());
 
-        Order result = productService.addToOrder(id, quantity, email);
+        AddToOrderDto result = productService.addToOrder(id, quantity, email);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(44.5, result.getTotalPrice());
-        Assertions.assertEquals(2, result.getProductItems().size());
-        Assertions.assertEquals(3, result.getProductItems().get(0).getQuantity());
+        Assertions.assertEquals(2, result.getProductItemsIds().size());
+        Assertions.assertEquals(productItem1.getUuid().toString(), result.getProductItemsIds().get(0));
     }
 
     @Test

@@ -61,6 +61,7 @@ public class Util {
     public static Order getOrder(String quantity) {
         return Order.builder()
                 .id(UUID.randomUUID())
+                .user(getUser())
                 .productItems(Arrays.asList(getProductItem(quantity))).build();
     }
 

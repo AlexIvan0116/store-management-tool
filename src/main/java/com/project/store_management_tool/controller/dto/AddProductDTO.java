@@ -23,4 +23,12 @@ public class AddProductDTO {
                 .price(price)
                 .build();
     }
+
+    public static AddProductDTO covertFromModel(Product addedProduct) {
+        return AddProductDTO.builder()
+                .name(addedProduct.getName())
+                .price(addedProduct.getPrice())
+                .description(addedProduct.getDescription())
+                .build();
+    }
 }

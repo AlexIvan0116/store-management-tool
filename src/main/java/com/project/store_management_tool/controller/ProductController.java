@@ -1,7 +1,6 @@
 package com.project.store_management_tool.controller;
 
-import com.project.store_management_tool.controller.dto.AddProductDTO;
-import com.project.store_management_tool.controller.dto.AddProductToOrderDTO;
+import com.project.store_management_tool.controller.dto.*;
 import com.project.store_management_tool.controller.validator.Validator;
 import com.project.store_management_tool.model.Order;
 import com.project.store_management_tool.model.Product;
@@ -29,27 +28,27 @@ public class ProductController {
 
     @PostMapping("/add")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Product> addProduct(@RequestBody AddProductDTO addProductDTO) {
+    public ResponseEntity<String> addProduct(@RequestBody AddProductDTO addProductDTO) {
         return ResponseEntity.status(HttpStatus.OK).body(productService.addProduct(addProductDTO));
     }
 
     @PostMapping("/add/multiple")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Product>> addProducts(@RequestBody List<AddProductDTO> addProductDtoToProductList) {
+    public ResponseEntity<List<String>> addProducts(@RequestBody List<AddProductDTO> addProductDtoToProductList) {
         return ResponseEntity.status(HttpStatus.OK).body(productService.addProducts(addProductDtoToProductList));
     }
 
     @GetMapping("/get/all")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<List<Product>> getAllProduct() {
+    public ResponseEntity<GetAllProductsDto> getAllProduct() {
         return ResponseEntity.status(HttpStatus.OK).body(productService.getAll());
     }
 
     @GetMapping("/get/{id}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<Product> getProductById(@PathVariable String id) throws ProductNotFoundException {
+    public ResponseEntity<ProductDto> getProductById(@PathVariable String id) throws ProductNotFoundException {
         if (!Validator.UUIDValidator(id)) {
-            log.error("Path variable format incorrect.");
+            log.info("Path variable format incorrect.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
@@ -58,9 +57,9 @@ public class ProductController {
 
     @PatchMapping("/price/{id}")
     @PreAuthorize("hasRole('ADMIN)')")
-    public ResponseEntity<Product> changePriceOfProduct(@PathVariable String id, @RequestBody String price) {
+    public ResponseEntity<ProductDto> changePriceOfProduct(@PathVariable String id, @RequestBody String price) {
         if (!(Validator.UUIDValidator(id) && Validator.priceValidator(price))) {
-            log.error("Path variable format incorrect.");
+            log.info("Path variable format incorrect.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
@@ -72,7 +71,7 @@ public class ProductController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteProductById(@PathVariable String id) throws ProductNotFoundException {
         if (!Validator.UUIDValidator(id)) {
-            log.error("Path variable format incorrect.");
+            log.info("Path variable format incorrect.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Empty");
         }
 
@@ -83,12 +82,12 @@ public class ProductController {
 
     @PostMapping("/addToOrder/{id}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<Order> addToOrder(@PathVariable String id,
-                @RequestBody AddProductToOrderDTO addProductToOrderDTO) throws ProductNotFoundException, UsernameNotFoundException {
+    public ResponseEntity<AddToOrderDto> addToOrder(@PathVariable String id,
+                                                    @RequestBody AddProductToOrderDTO addProductToOrderDTO) throws ProductNotFoundException, UsernameNotFoundException {
         if (!(Validator.UUIDValidator(id) &&
                 Validator.quantityValidator(addProductToOrderDTO.getQuantity()) &&
                 Validator.emailValidator(addProductToOrderDTO.getEmail()))) {
-            log.error("Incorrect input");
+            log.info("Incorrect input");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 

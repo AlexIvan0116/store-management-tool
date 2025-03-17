@@ -1,6 +1,9 @@
 package com.project.store_management_tool.service;
 
 import com.project.store_management_tool.controller.dto.AddProductDTO;
+import com.project.store_management_tool.controller.dto.AddToOrderDto;
+import com.project.store_management_tool.controller.dto.GetAllProductsDto;
+import com.project.store_management_tool.controller.dto.ProductDto;
 import com.project.store_management_tool.model.Order;
 import com.project.store_management_tool.model.Product;
 import com.project.store_management_tool.model.ProductItem;
@@ -32,31 +35,37 @@ public class ProductService {
     private UserRepository userRepository;
 
     @Transactional
-    public Product addProduct(AddProductDTO addProductDTO) {
-        return productRepository.save(addProductDTO.convertToModel());
+    public String addProduct(AddProductDTO addProductDTO) {
+        Product addedProduct = productRepository.save(addProductDTO.convertToModel());
+
+        return addedProduct.getId().toString();
     }
 
     @Transactional
-    public List<Product> addProducts(List<AddProductDTO> addProductDtoToProductList) {
+    public List<String> addProducts(List<AddProductDTO> addProductDtoToProductList) {
         List<Product> products = addProductDtoToProductList.stream().map(AddProductDTO::convertToModel)
                 .collect(Collectors.toList());
-        return productRepository.saveAll(products);
+
+        productRepository.saveAll(products);
+
+        return products.stream().map(product -> product.getId().toString()).collect(Collectors.toList());
     }
 
-    public List<Product> getAll() {
-        return productRepository.findAll();
+    public GetAllProductsDto getAll() {
+        List<Product> products = productRepository.findAll();
+        return GetAllProductsDto.convertFromModel(products);
     }
 
-    public Product getProductById(UUID id) throws ProductNotFoundException {
+    public ProductDto getProductById(UUID id) throws ProductNotFoundException {
         Optional<Product> productOptional = productRepository.findById(id);
         if (productOptional.isEmpty()) {
             throw new ProductNotFoundException("Product not found", id);
         }
-        return productOptional.get();
+        return ProductDto.convertFromModel(productOptional.get());
     }
 
     @Transactional
-    public Product changePriceOfProduct(UUID id, Double price) throws ProductNotFoundException {
+    public ProductDto changePriceOfProduct(UUID id, Double price) throws ProductNotFoundException {
         Optional<Product> productOptional = productRepository.findById(id);
         if (productOptional.isEmpty()) {
             throw new ProductNotFoundException("Product not found", id);
@@ -74,13 +83,12 @@ public class ProductService {
             return item;
         }).collect(Collectors.toList());
 
-        itemsAfterChangingPrice.stream().map(item -> {
+        itemsAfterChangingPrice.forEach(item -> {
             Order order = item.getOrder();
             order.setTotalPrice(order.getTotalPrice() + (price - oldPrice) * item.getQuantity());
-            return order;
-        }).collect(Collectors.toList());
+        });
 
-        return productRepository.findById(id).get();
+        return ProductDto.convertFromModel(productRepository.findById(id).get());
     }
 
     @Transactional
@@ -108,7 +116,7 @@ public class ProductService {
     }
 
     @Transactional
-    public Order addToOrder(UUID id, Integer quantity, String email) throws  ProductNotFoundException, UsernameNotFoundException {
+    public AddToOrderDto addToOrder(UUID id, Integer quantity, String email) throws  ProductNotFoundException, UsernameNotFoundException {
         Optional<Product> productOptional = productRepository.findById(id);
         if (productOptional.isEmpty()) {
             throw new ProductNotFoundException("Product not found", id);
@@ -128,7 +136,7 @@ public class ProductService {
         Order order = updateOrder(email, productItem);
         productRepository.save(product);
 
-        return order;
+        return AddToOrderDto.convertFromModel(order);
     }
 
     @Transactional
