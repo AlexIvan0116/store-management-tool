@@ -1,9 +1,9 @@
 package com.project.store_management_tool.service;
 
-import com.project.store_management_tool.controller.dto.AddProductDTO;
-import com.project.store_management_tool.controller.dto.AddToOrderDto;
-import com.project.store_management_tool.controller.dto.GetAllProductsDto;
-import com.project.store_management_tool.controller.dto.ProductDto;
+import com.project.store_management_tool.controller.dto.product.AddProductDTO;
+import com.project.store_management_tool.controller.dto.product.AddToOrderDto;
+import com.project.store_management_tool.controller.dto.product.GetAllProductsDto;
+import com.project.store_management_tool.controller.dto.product.ProductDto;
 import com.project.store_management_tool.model.Order;
 import com.project.store_management_tool.model.Product;
 import com.project.store_management_tool.model.ProductItem;

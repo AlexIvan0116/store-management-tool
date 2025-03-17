@@ -1,8 +1,6 @@
 package com.project.store_management_tool.service;
 
-import com.project.store_management_tool.controller.dto.UserDto;
-import com.project.store_management_tool.model.Order;
-import com.project.store_management_tool.model.Product;
+import com.project.store_management_tool.controller.dto.user.UserDto;
 import com.project.store_management_tool.model.User;
 import com.project.store_management_tool.model.UserRoles;
 import com.project.store_management_tool.repository.UserRepository;

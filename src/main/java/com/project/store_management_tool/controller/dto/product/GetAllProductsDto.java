@@ -1,4 +1,4 @@
-package com.project.store_management_tool.controller.dto;
+package com.project.store_management_tool.controller.dto.product;
 
 import com.project.store_management_tool.model.Product;
 import lombok.*;

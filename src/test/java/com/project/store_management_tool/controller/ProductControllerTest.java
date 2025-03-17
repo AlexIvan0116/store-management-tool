@@ -1,7 +1,7 @@
 package com.project.store_management_tool.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.store_management_tool.controller.dto.*;
+import com.project.store_management_tool.controller.dto.product.*;
 import com.project.store_management_tool.model.Order;
 import com.project.store_management_tool.model.Product;
 import com.project.store_management_tool.service.ProductService;

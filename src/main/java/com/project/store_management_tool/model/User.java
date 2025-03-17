@@ -1,6 +1,6 @@
 package com.project.store_management_tool.model;
 
-import com.project.store_management_tool.controller.dto.UserDto;
+import com.project.store_management_tool.controller.dto.user.UserDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;

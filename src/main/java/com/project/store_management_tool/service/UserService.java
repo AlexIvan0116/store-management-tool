@@ -1,15 +1,14 @@
 package com.project.store_management_tool.service;
 
-import com.project.store_management_tool.controller.dto.LoginUserDTO;
-import com.project.store_management_tool.controller.dto.RegisterUserDTO;
-import com.project.store_management_tool.controller.dto.UserDto;
+import com.project.store_management_tool.controller.dto.user.LoginUserDTO;
+import com.project.store_management_tool.controller.dto.user.RegisterUserDTO;
+import com.project.store_management_tool.controller.dto.user.UserDto;
 import com.project.store_management_tool.model.User;
 import com.project.store_management_tool.repository.UserRepository;
 import com.project.store_management_tool.service.exception.UserAlreadyRegisteredException;
 import com.project.store_management_tool.util.JWTUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;

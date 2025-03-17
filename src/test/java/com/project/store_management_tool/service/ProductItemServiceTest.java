@@ -1,5 +1,7 @@
 package com.project.store_management_tool.service;
 
+import com.project.store_management_tool.controller.dto.item.ProductItemDto;
+import com.project.store_management_tool.controller.dto.item.ProductItemsByUserDto;
 import com.project.store_management_tool.model.Order;
 import com.project.store_management_tool.model.ProductItem;
 import com.project.store_management_tool.model.User;
@@ -65,9 +67,9 @@ public class ProductItemServiceTest {
         Mockito.when(userRepository.getByEmail(Mockito.any(String.class))).thenReturn(Optional.of(user1));
         Mockito.when(productItemRepository.findAll()).thenReturn(productItems);
 
-        List<ProductItem> result =  productItemService.getItemsByUser(user1.getEmail());
+        List<ProductItemsByUserDto> result =  productItemService.getItemsByUser(user1.getEmail());
         Assertions.assertEquals(2, result.size());
-        Assertions.assertEquals("ex1@gmail.com", result.get(0).getOrder().getUser().getEmail());
+        Assertions.assertEquals("ex1@gmail.com", result.get(0).getUserEmail());
     }
 
     @Test
@@ -100,7 +102,7 @@ public class ProductItemServiceTest {
         Mockito.when(userRepository.getByEmail(Mockito.any(String.class))).thenReturn(Optional.of(user2));
         Mockito.when(productItemRepository.findAll()).thenReturn(productItems);
 
-        List<ProductItem> result =  productItemService.getItemsByUser(user2.getEmail());
+        List<ProductItemsByUserDto> result =  productItemService.getItemsByUser(user2.getEmail());
         Assertions.assertEquals(0, result.size());
     }
 }

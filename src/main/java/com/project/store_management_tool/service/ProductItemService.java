@@ -1,5 +1,7 @@
 package com.project.store_management_tool.service;
 
+import com.project.store_management_tool.controller.dto.item.ProductItemDto;
+import com.project.store_management_tool.controller.dto.item.ProductItemsByUserDto;
 import com.project.store_management_tool.model.Order;
 import com.project.store_management_tool.model.ProductItem;
 import com.project.store_management_tool.model.User;
@@ -20,11 +22,12 @@ public class ProductItemService {
     private final ProductItemRepository productItemRepository;
     private final UserRepository userRepository;
 
-    public List<ProductItem> getAllItems() {
-        return productItemRepository.findAll();
+    public List<ProductItemDto> getAllItems() {
+        List<ProductItem> items = productItemRepository.findAll();
+        return items.stream().map(ProductItemDto::convertFromModel).collect(Collectors.toList());
     }
 
-    public List<ProductItem> getItemsByUser(String email) throws UsernameNotFoundException {
+    public List<ProductItemsByUserDto> getItemsByUser(String email) throws UsernameNotFoundException {
         Optional<User> optionalUser = userRepository.getByEmail(email);
 
         if (optionalUser.isEmpty()) {
@@ -37,8 +40,18 @@ public class ProductItemService {
         User user = optionalUser.get();
         Optional<Map.Entry<Order, List<ProductItem>>> resultEntry =
                 groupedProductItems.entrySet().stream()
-                        .filter(orderListEntry -> user.equals(orderListEntry.getKey().getUser())).findFirst();
+                        .filter(orderListEntry -> user.getEmail().equals(orderListEntry.getKey().getUser().getEmail()))
+                        .findFirst();
 
-        return resultEntry.isPresent() ? resultEntry.get().getValue() : new ArrayList<>();
+        if (resultEntry.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<ProductItemsByUserDto> groupedItems = resultEntry.get().getValue()
+                .stream().map(
+                        productItem -> ProductItemsByUserDto.convertFromModel(productItem, user.getId().toString(), email))
+                .collect(Collectors.toList());
+
+        return groupedItems;
     }
 }

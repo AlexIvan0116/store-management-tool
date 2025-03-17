@@ -1,9 +1,7 @@
 package com.project.store_management_tool.controller;
 
-import com.project.store_management_tool.controller.dto.*;
+import com.project.store_management_tool.controller.dto.product.*;
 import com.project.store_management_tool.controller.validator.Validator;
-import com.project.store_management_tool.model.Order;
-import com.project.store_management_tool.model.Product;
 import com.project.store_management_tool.service.ProductService;
 import com.project.store_management_tool.service.exception.ItemNotFoundInOrderException;
 import com.project.store_management_tool.service.exception.OrderNotFoundException;

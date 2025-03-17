@@ -1,6 +1,6 @@
 package com.project.store_management_tool.model;
 
-import com.project.store_management_tool.controller.dto.GetOrderDTO;
+import com.project.store_management_tool.controller.dto.order.GetOrderDTO;
 import jakarta.persistence.*;
 import lombok.*;
 

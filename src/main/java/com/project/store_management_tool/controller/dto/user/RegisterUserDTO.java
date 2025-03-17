@@ -1,4 +1,4 @@
-package com.project.store_management_tool.controller.dto;
+package com.project.store_management_tool.controller.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.store_management_tool.model.User;

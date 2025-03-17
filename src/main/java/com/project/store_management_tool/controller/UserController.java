@@ -1,8 +1,8 @@
 package com.project.store_management_tool.controller;
 
-import com.project.store_management_tool.controller.dto.LoginUserDTO;
-import com.project.store_management_tool.controller.dto.RegisterUserDTO;
-import com.project.store_management_tool.controller.dto.UserDto;
+import com.project.store_management_tool.controller.dto.user.LoginUserDTO;
+import com.project.store_management_tool.controller.dto.user.RegisterUserDTO;
+import com.project.store_management_tool.controller.dto.user.UserDto;
 import com.project.store_management_tool.model.User;
 import com.project.store_management_tool.service.UserService;
 import com.project.store_management_tool.service.exception.UserAlreadyRegisteredException;

@@ -1,6 +1,6 @@
 package com.project.store_management_tool.controller;
 
-import com.project.store_management_tool.controller.dto.GetOrderDTO;
+import com.project.store_management_tool.controller.dto.order.GetOrderDTO;
 import com.project.store_management_tool.controller.validator.Validator;
 import com.project.store_management_tool.service.OrderService;
 import lombok.AllArgsConstructor;

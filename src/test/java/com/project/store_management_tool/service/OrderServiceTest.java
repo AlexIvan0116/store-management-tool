@@ -1,6 +1,6 @@
 package com.project.store_management_tool.service;
 
-import com.project.store_management_tool.controller.dto.GetOrderDTO;
+import com.project.store_management_tool.controller.dto.order.GetOrderDTO;
 import com.project.store_management_tool.model.Order;
 import com.project.store_management_tool.model.User;
 import com.project.store_management_tool.repository.OrderRepository;

@@ -1,6 +1,8 @@
 package com.project.store_management_tool.controller;
 
 
+import com.project.store_management_tool.controller.dto.item.ProductItemDto;
+import com.project.store_management_tool.controller.dto.item.ProductItemsByUserDto;
 import com.project.store_management_tool.controller.validator.Validator;
 import com.project.store_management_tool.model.ProductItem;
 import com.project.store_management_tool.service.ProductItemService;
@@ -23,13 +25,13 @@ public class ProductItemController {
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<ProductItem>> getItems() {
+    public ResponseEntity<List<ProductItemDto>> getItems() {
         return ResponseEntity.status(HttpStatus.OK).body(productItemService.getAllItems());
     }
 
     @GetMapping("/by/user/{email}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<ProductItem>> getByUserEmail(@PathVariable String email) throws UsernameNotFoundException {
+    public ResponseEntity<List<ProductItemsByUserDto>> getByUserEmail(@PathVariable String email) throws UsernameNotFoundException {
         if (!Validator.emailValidator(email)) {
             log.error("Input error.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
