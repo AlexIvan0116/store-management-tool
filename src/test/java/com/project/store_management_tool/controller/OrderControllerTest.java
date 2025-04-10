@@ -11,6 +11,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -42,26 +46,31 @@ public class OrderControllerTest {
     @WithMockUser(roles = "ADMIN")
     public void getAllOrders() throws Exception {
         List<GetOrderDTO> orders = Util.getOrders().stream().map(Order::convertToGetOrderDTO).collect(Collectors.toList());
-        Mockito.when(orderService.getAllOrders()).thenReturn(orders);
 
-        mockMvc.perform(get("/api/order/all")
+        Page<GetOrderDTO> pageMock = new PageImpl<>(orders, PageRequest.of(0, 20), 4);
+
+        Mockito.when(orderService.getAllOrders(Mockito.any(Pageable.class))).thenReturn(pageMock);
+
+        mockMvc.perform(get("/api/order/all?page=0&size=4")
                 .header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[2]").exists());
+                .andExpect(jsonPath("$.content.length()").value(4))
+                .andExpect(jsonPath("$.content[2]").exists());
     }
 
     @Test
     @WithMockUser(roles = "USER")
     public void getOrderByEmail() throws Exception {
-        List<Order> orders = Util.getOrders();
+        List<GetOrderDTO> orders = Util.getOrders().stream().map(Order::convertToGetOrderDTO).collect(Collectors.toList());
+        Page<GetOrderDTO> pageMock = new PageImpl<>(orders, PageRequest.of(0, 20), 4);
         String email = "ex@gmail.com";
-        Mockito.when(orderService.getOrdersByEmailUser(Mockito.any(String.class)))
-                .thenReturn(orders.stream().map(Order::convertToGetOrderDTO).collect(Collectors.toList()));
+        Mockito.when(orderService.getOrdersByEmail(Mockito.any(String.class), Mockito.any(Pageable.class))).thenReturn(pageMock);
 
         mockMvc.perform(get("/api/order/get/{email}", email)
                 .header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[2]").exists());
+                .andExpect(jsonPath("$.content.length()").value(4))
+                .andExpect(jsonPath("$.content[2]").exists());
     }
 
     @Test

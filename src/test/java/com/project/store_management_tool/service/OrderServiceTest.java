@@ -13,12 +13,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
@@ -59,21 +64,27 @@ public class OrderServiceTest {
         order5.setUser(user3);
 
         List<Order> orders = new ArrayList<>(Arrays.asList(order1, order2, order3, order4, order5, order6));
+        List<Order> filteredOrders = orders.stream()
+                .filter(order -> order.getUser().getEmail().equals(user2.getEmail()))
+                .collect(Collectors.toList());
+        Page<Order> pageMock = new PageImpl<>(filteredOrders, PageRequest.of(0, 10), 3);
+
         Mockito.when(userRepository.getByEmail(user2.getEmail())).thenReturn(Optional.of(user2));
-        Mockito.when(orderRepository.findAll()).thenReturn(orders);
+        Mockito.when(orderRepository.findByUserEmail(Mockito.any(String.class), Mockito.any(Pageable.class))).thenReturn(pageMock);
 
-        List<GetOrderDTO> result = orderService.getOrdersByEmailUser(user2.getEmail());
+        Page<GetOrderDTO> result = orderService.getOrdersByEmail(user2.getEmail(), PageRequest.of(0, 10));
 
-        Assertions.assertEquals(3, result.size());
-        Assertions.assertTrue(result.contains(order2.convertToGetOrderDTO()));
-        Assertions.assertTrue(result.contains(order3.convertToGetOrderDTO()));
-        Assertions.assertTrue(result.contains(order4.convertToGetOrderDTO()));
+        Assertions.assertEquals(3, result.getTotalElements());
+        Assertions.assertTrue(result.getContent().contains(order2.convertToGetOrderDTO()));
+        Assertions.assertTrue(result.getContent().contains(order3.convertToGetOrderDTO()));
+        Assertions.assertTrue(result.getContent().contains(order4.convertToGetOrderDTO()));
     }
 
     @Test
     public void getOrdersByEmailUser_UsernameNotFoundException() {
+        String mockEmail = "ex@gmail.com";
         Mockito.when(userRepository.getByEmail(Mockito.any(String.class))).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(UsernameNotFoundException.class, () -> orderService.getOrdersByEmailUser("ex@gmail.com"));
+        Assertions.assertThrows(UsernameNotFoundException.class, () -> orderService.getOrdersByEmail(mockEmail, PageRequest.of(0, 10)));
     }
 }
